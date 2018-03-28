@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Created by marcello on 28/03/18.
@@ -27,7 +28,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
     /**
      * List with uuids of Treasures that have been found by the user.
      */
-    private ArrayList<String> uuidFoundTreasures;
+    private Set<String> uuidFoundTreasures;
     /**
      * ApplicationContext
      */
@@ -48,7 +49,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
      * @param uuidFoundTreasures List with Treasure uuids that have been found already
      * @param context ApplicationContext
      */
-    TreasureAdapter(ArrayList<Treasure> data, ArrayList<String> uuidFoundTreasures, Context context) {
+    TreasureAdapter(ArrayList<Treasure> data, Set<String> uuidFoundTreasures, Context context) {
         super(context, R.layout.treasure_row, data);
         this.treasures = data;
         this.uuidFoundTreasures = uuidFoundTreasures;
@@ -85,7 +86,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
         // Set the image
         // Choose Treasure picture depending on whether the Treasure has been found or not
-        if(uuidFoundTreasures.indexOf(treasure.getUuid()) >= 0){
+        if(uuidFoundTreasures.contains(treasure.getUuid())){
             // The user has already found the Treasure
             viewHolder.image.setImageResource(R.drawable.treasure_open);
         } else{

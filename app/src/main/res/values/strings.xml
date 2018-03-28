@@ -4,9 +4,12 @@
     <string name="resettreasures">Reset Treasures</string>
     <string name="estimated_tta">Estimated time to arrival</string>
     <string name="time_passed">Time passed</string>
+    <string name="time">Time</string>
     <string name="current_temperature">Current temperature</string>
+    <string name="temperature">Temperature</string>
     <string name="current_speed">Current Speed</string>
-    <string name="avergae_speed">Average Speed</string>
+    <string name="speed">Speed</string>
+    <string name="averageSpeed">Average Speed</string>
     <string name="distance">Distance</string>
     <string name="abort_button">Go back</string>
     <string name="congratulations">Congratulations, you found a treasure!</string>

@@ -3,6 +3,8 @@ package ch.mbuehler.eth.mgis.treasurego;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Singleton holding the current game status.
@@ -27,17 +29,21 @@ public class GameStatus {
     /**
      * List of the uuids of all Treasures that have already been discovered in this session.
      */
-    private ArrayList<String> uuidTreasuresFound;
+//    private ArrayList<String> uuidTreasuresFound;
+
     /**
-     * Quests
+     * Contains data about previous Quests. For each Treasure we store all Quests that have
+     * been finished for that Treasure
+     * Key: uuid of Treasure
+     * Value: ArrayList of Quest instances
      */
-    private ArrayList<Quest> quests;
+    private HashMap<String, ArrayList<Quest>> treasureQuests;
+
 
     private GameStatus(){
         allTreasures = new ArrayList<>();
-        uuidTreasuresFound = new ArrayList<>();
-        quests = new ArrayList<>();
         hasBeenInitialized = false;
+        treasureQuests = new HashMap<>();
     }
 
     /**
@@ -62,8 +68,7 @@ public class GameStatus {
         Instance().setAllTreasures(allTreasures);
 
         // Initialize as empty ArrayList
-        Instance().uuidTreasuresFound = new ArrayList<>();
-        Instance().setQuests(new ArrayList<Quest>());
+        Instance().treasureQuests = new HashMap<>();
     }
 
     public ArrayList<Treasure> getAllTreasures() {
@@ -78,38 +83,54 @@ public class GameStatus {
      * Returns all the uuids of the Treasures that have been found
      * @return
      */
-    public  ArrayList<String> getUuidTreasuresFound() {
-        return Instance().uuidTreasuresFound;
+    Set<String> getUuidTreasuresFound() {
+        return Instance().treasureQuests.keySet();
     }
 
-    public void addUuidTreasuresFound(String uuid){
-        Instance().uuidTreasuresFound.add(uuid);
+    /**
+     * Adds a Quest to treasureQuest
+     * If treasureQuest has no entry for the associated Treasure, a new entry is created.
+     * If treasureQuest already has an entry for the associated Treasure, the provided Quest
+     * is appended.
+     * @param quest
+     */
+    void addQuest(Quest quest){
+        String treasureKey = quest.getTreasure().getUuid();
+        if(treasureQuests.get(treasureKey) == null){
+            ArrayList<Quest> questList = new ArrayList<>();
+            questList.add(quest);
+            treasureQuests.put(treasureKey, questList);
+        } else{
+            treasureQuests.get(treasureKey).add(quest);
+        }
     }
 
-    public ArrayList<Quest> getQuests() {
-        return Instance().quests;
+    /**
+     * Returns the last Quest for the given Treasure UUID. If no such Quest exists,
+     * this method returns null.
+     * @param uuid uuid of a Treasure
+     * @return Quest or null
+     */
+    public Quest getLastQuestForTreasureUuid(String uuid){
+        Quest lastQuest;
+        if(treasureQuests.containsKey(uuid) && treasureQuests.get(uuid).size() > 0){
+            // The associated ArrayList contains at least one entry.
+            // We return the last entry.
+            ArrayList<Quest> questList = treasureQuests.get(uuid);
+            lastQuest = questList.get(questList.size() - 1);
+        } else {
+            // There is no entry. We cannot return a Quest instance
+            lastQuest = null;
+        }
+        return lastQuest;
     }
 
-    public void setQuests(ArrayList<Quest> quests) {
-        Instance().quests = quests;
-    }
-
-    public void addQuest(Quest quest){
-        Instance().quests.add(quest);
-    }
-
-    public boolean hasBeenInitialized() {
+    boolean hasBeenInitialized() {
         return Instance().hasBeenInitialized;
     }
-    public void setHasBeenInitialized(boolean hasBeenInitialized) {
+    void setHasBeenInitialized(boolean hasBeenInitialized) {
         Instance().hasBeenInitialized = hasBeenInitialized;
     }
 
-    public Quest getLastQuest(){
-        int nQuests = getQuests().size();
-        if(nQuests > 0){
-            return getQuests().get(nQuests - 1);
-        }
-        return null;
-    }
+
 }

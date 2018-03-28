@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,11 +140,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         return airplainModeIsOff && gps_enabled;
 
     }
-
-    private String formatDouble(double d, int precision) {
-        return String.format("%1$,." + precision + "f", d);
-    }
-//
 
     /**
      * Azimuth (degrees of rotation about the -z axis). This is the angle between the device's current compass direction and magnetic north. If the top edge of the device faces magnetic north, the azimuth is 0 degrees; if the top edge faces south, the azimuth is 180 degrees. Similarly, if the top edge faces east, the azimuth is 90 degrees, and if the top edge faces west, the azimuth is 270 degrees.
@@ -286,10 +282,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             onTargetLocationReached();
         } else if (distance > 1000) {
             // Display the distance in km
-            distanceText = this.formatDouble(distance / 1000, 1) + " km";
+            distanceText = Formatter.formatDouble(distance / 1000, 1) + " km";
         } else {
             // Display the distance in m
-            distanceText = this.formatDouble(distance, 1) + " m";
+            distanceText = Formatter.formatDouble(distance, 1) + " m";
         }
         updateDistance(distanceText);
     }
@@ -408,7 +404,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     private void updateAverageSpeed() {
         double averageSpeed = this.getAverageSpeed();
         TextView avgSpeedView = (TextView) findViewById(R.id.averageSpeedValue);
-        avgSpeedView.setText(this.formatDouble(averageSpeed, 1) + " m/s");
+        avgSpeedView.setText(Formatter.formatDouble(averageSpeed, 1) + " m/s");
     }
 
     private void updateCurrentSpeed() {
@@ -417,7 +413,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
         try {
             float currentSpeed = this.getCurrentLocation().getSpeed();
-            text = String.format("%.1f m/s", currentSpeed);
+            text = Formatter.formatDouble(currentSpeed, 1)+ " m/s";
         } catch (LocationNotFoundException e) {
             text = "n.a.";
         } finally {
@@ -434,7 +430,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         // TODO: handle case if temperature is not available.
         float currentTemperature = this.currentTemperature;
         TextView temperatureView = (TextView) findViewById(R.id.currentTemperatureValue);
-        temperatureView.setText(String.format("%.1f \u2103", currentTemperature));
+        String temperatureString = Formatter.formatDouble(currentTemperature, 1) + " \u2103";
+        temperatureView.setText(temperatureString);
     }
 
     private void updateTime() {
@@ -568,14 +565,16 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     }
 
     private void onTargetLocationReached() {
+        // This check is necessary to prevent that
+        // this method is called several times for the same Quest
         if(!this.targetReached){
             this.targetReached = true;
 
             Quest completedQuest = new Quest(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature(), QuestStatus.COMPLETED);
             GameStatus.Instance().addQuest(completedQuest);
-            GameStatus.Instance().addUuidTreasuresFound(getTargetTreasure().getUuid());
 
             Intent intent = new Intent(this, TreasureFoundActivity.class);
+            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
             startActivity(intent);
         }
     }

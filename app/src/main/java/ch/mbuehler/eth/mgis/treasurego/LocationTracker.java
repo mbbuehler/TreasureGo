@@ -30,7 +30,7 @@ class LocationTracker {
      * Number of samples used to calculate the smoothed distance to a point. This helps avoiding
      * "jump" due to noisy measurements.
      */
-    private final int N_SMOOTHING_LOCATIONS = 5;
+    private final int N_SMOOTHING_LOCATIONS = 1;
 
     LocationTracker() {
         this.millisecondsStart = System.currentTimeMillis();
