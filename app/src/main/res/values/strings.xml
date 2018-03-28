@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">TreasureGo</string>
+    <string name="startQuest">Start Quest</string>
+    <string name="resettreasures">Reset Treasures</string>
+    <string name="estimated_tta">Estimated time to arrival</string>
+    <string name="time_passed">Time passed</string>
+    <string name="current_temperature">Current temperature</string>
+    <string name="current_speed">Current Speed</string>
+    <string name="avergae_speed">Average Speed</string>
+    <string name="distance">Distance</string>
+    <string name="abort_button">Go back</string>
+    <string name="congratulations">Congratulations, you found a treasure!</string>
+    <string name="play_again">Play again!</string>
+    <string name="close_app">Close app</string>
+    <string name="searchingForText">Searching for</string>
+    <string name="searchingForValue">Treasure</string>
+    <string name="n.a.">n.a.</string>
+    <string name="noLocationServicesAvailable">GPS does not seem to be available. Have you switched it on or are you in flight mode?</string>
+    <string name="openLocationSettings">Would you like to open the location settings?</string>
+    <string name="cancel">Cancel</string>
+    <string name="currentReward">Current reward <!--speed up to gain more)--></string>
+    <string name="score">Score</string>
+</resources>
