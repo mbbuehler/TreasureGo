@@ -5,18 +5,32 @@ import android.content.Context;
 import java.util.ArrayList;
 
 /**
- * Created by marcello on 27/03/18.
+ * Singleton holding the current game status.
  */
-
 public class GameStatus {
 
+    /**
+     * Singleton instance
+     */
     private static GameStatus instance;
 
+    /**
+     * True if the Treasures have been loaded
+     */
     private boolean hasBeenInitialized;
 
+    /**
+     * Holds all Treasures for one session
+     */
     private ArrayList<Treasure> allTreasures;
 
+    /**
+     * List of the uuids of all Treasures that have already been discovered in this session.
+     */
     private ArrayList<String> uuidTreasuresFound;
+    /**
+     * Quests
+     */
     private ArrayList<Quest> quests;
 
     private GameStatus(){
@@ -31,14 +45,18 @@ public class GameStatus {
      * Synchronized is needed to make this method thread safe
      * @return
      */
-    public static synchronized GameStatus Instance(){
+    static synchronized GameStatus Instance(){
         if(instance == null){
             instance = new GameStatus();
         }
         return instance;
     }
 
-    public void reset(Context context){
+    /**
+     * Resets all data for this GameStatus.
+     * @param context ApplicationContext
+     */
+    void reset(Context context){
         // Load all treasures from file
         ArrayList<Treasure> allTreasures = new TreasureLoader().loadTreasures(context);
         Instance().setAllTreasures(allTreasures);
@@ -55,6 +73,11 @@ public class GameStatus {
     public void setAllTreasures(ArrayList<Treasure> allTreasures) {
         Instance().allTreasures = allTreasures;
     }
+
+    /**
+     * Returns all the uuids of the Treasures that have been found
+     * @return
+     */
     public  ArrayList<String> getUuidTreasuresFound() {
         return Instance().uuidTreasuresFound;
     }
@@ -89,5 +112,4 @@ public class GameStatus {
         }
         return null;
     }
-
 }

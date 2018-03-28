@@ -1,12 +1,11 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 /**
- * Created by marcello on 18/03/18.
+ * Exception thrown when we did not find a Location.
  */
+class LocationNotFoundException extends Exception {
 
-public class LocationNotFoundException extends Exception {
-
-    public LocationNotFoundException(String message){
+    LocationNotFoundException(String message){
         super(message);
     }
 }

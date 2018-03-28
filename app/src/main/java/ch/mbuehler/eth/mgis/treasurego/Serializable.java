@@ -1,9 +1,9 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 /**
- * Created by marcello on 16/03/18.
+ * Custom interface for Serializable classes.
+ * Implemented by classes passing data between Intents.
  */
-
 interface Serializable {
 
     /**

@@ -230,6 +230,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/noLocationServicesAvailable"
         android:textColor="?attr/colorError"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/back"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -5,5 +5,5 @@ package ch.mbuehler.eth.mgis.treasurego;
  */
 
 public enum QuestStatus {
-    COMPLETED;
+    COMPLETED
 }

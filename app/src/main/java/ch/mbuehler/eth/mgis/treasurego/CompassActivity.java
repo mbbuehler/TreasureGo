@@ -67,7 +67,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private static final int DIST_TARGET_REACHED = 100; // in meters TODO: adjust
 
-
+    private boolean hasUserDeniedPermissions = false;
 
     private long startTime = 0;
     private long lastMeasuredTime = 0;
@@ -176,44 +176,69 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     /* ================== Permissions Section  ================== */
 
+    /**
+     * Checks the required permissions and requests them if needed.
+     * Required permissions:
+     * - Manifest.permission.ACCESS_FINE_LOCATION
+     * - Manifest.permission.ACCESS_COARSE_LOCATION
+     */
     private void checkPermissions() {
-        List<String> permissionsNeeded = new ArrayList<>();
-        final List<String> permissionsList = new ArrayList<>();
+        // All required permissions
+        String[] permissions = new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                // We don't need this because we store the CSV file with the app itself.
+                // Uncomment this file if you want to read the CSV file from external storage.
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+        };
 
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            permissionsNeeded.add("GPS");
-        }
-        if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            permissionsNeeded.add("coarse location");
-        }
-        if (!addPermission(permissionsList, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            permissionsNeeded.add("read external storage");
+        // Holds permissions that we need to ask permissions for.
+        final List<String> permissionsList = new ArrayList<>();
+        // Add permissions that we don't have yet
+        for(String permission: permissions){
+            addPermission(permissionsList, permission);
         }
 
         if (permissionsList.size() > 0) {
-            if (permissionsNeeded.size() > 0) {
-                ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_ASK_PERMISSION);
-                return;
-            }
+            // We have permissions to ask for
             ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_ASK_PERMISSION);
-            return;
         }
-        return;
     }
 
+    /**
+     * Requests Location updates from the locationManager. If there are missing permissions,
+     * the user is asked to provide them.
+     */
     private void enableLocationUpdates() {
+        if(hasUserDeniedPermissions){
+            // The user has already denied permissions. Go back to MainActivity.
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            // Inform the user why we went back.
+            Toast.makeText(this, R.string.pleasePermissions, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Check if we have the required permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BW_UPDATES, DIST_BW_UPDATES, this);
         } else {
+            // Ask user for permission
             checkPermissions();
-            enableLocationUpdates();
         }
     }
 
+    /**
+     * Checks if permission has been granted. If not the permission code is added to permissionList
+     * https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+     * @param permissionsList
+     * @param permission
+     * @return true if permission has been granted and false otherwise
+     */
     private boolean addPermission(List<String> permissionsList, String permission) {
-        // https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            // Permission has not been granted. Add it to the list.
             permissionsList.add(permission);
 
             if (!shouldShowRequestPermissionRationale(permission)) {
@@ -224,26 +249,37 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     }
 
     /* ================== Handling Sensor Updates Section  ================== */
+
+    /**
+     * Extracts the measured temperature from the sensor values and updates the View.
+     * @param sensorValues
+     */
     private void handleTemperatureUpdate(float[] sensorValues) {
         this.currentTemperature = sensorValues[0];
         this.updateTemperature();
     }
 
+    /**
+     * Update the values for the rotationMatrix and orientation.
+     * See
+     * https://developer.android.com/guide/topics/sensors/sensors_position.html
+     * for more information
+     * @param sensorValues
+     */
     private void handleRotationUpdate(float[] sensorValues) {
-        // https://developer.android.com/guide/topics/sensors/sensors_position.html
-
-//        SensorManager.remapCoordinateSystem(mRotationMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Z, mRotationMatrix);
         SensorManager.getRotationMatrixFromVector(mRotationMatrix, sensorValues);
         SensorManager.getOrientation(mRotationMatrix, orientation);
     }
 
+    /**
+     * Distance to target Treasure has changed. If we are close enough to the target Treasure,
+     * we will call onTargetReached(). If not we will update the view with the current distance.
+     */
     private void handleDistanceToTargetUpdate() {
 
         String distanceText = "n.a.";
 
-//        try{
-//            Location currentLocation = getCurrentLocation();
-//            double distance = (double) currentLocation.distanceTo(this.targetLocation);
+        //
         double distance = this.locationTracker.calculateSmoothedDistanceTo(this.targetLocation);
         if (distance < DIST_TARGET_REACHED) {
             // We have reached the target location
@@ -255,10 +291,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             // Display the distance in m
             distanceText = this.formatDouble(distance, 1) + " m";
         }
-//        } catch(LocationNotFoundException e){
-//            // We cannot calculate the distance
-//            distanceText = "n.a.";
-//        }
         updateDistance(distanceText);
     }
 
@@ -461,26 +493,19 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onResume() {
         super.onResume();
-
-        // Listeners for other sensors
-//        this.sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        // Listeners for Orientation
         this.sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
-//        this.sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
-//        this.sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_NORMAL);
+        // Listener for Temperature
         this.sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE), SensorManager.SENSOR_DELAY_NORMAL);
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            enableLocationUpdates();
-//        }
+
+        //
         enableLocationUpdates();
-        this.currentLocation = this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER); //TODO: solve better
-
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        // Save battery
         this.sensorManager.unregisterListener(this);
     }
 
@@ -526,18 +551,18 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    Toast.makeText(this, "Thank you!", Toast.LENGTH_SHORT).show();
-
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BW_UPDATES, DIST_BW_UPDATES, this);
-                        return;
+                    // Thank the user for granting permissions
+                    Toast.makeText(this, "Thank you and have fun!", Toast.LENGTH_SHORT).show();
+                    enableLocationUpdates();
+                    hasUserDeniedPermissions = false;
 //                    }
-                    } else {
-                        System.exit(0);
-                        // close app or give error message
-                    }
+                } else if(grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_DENIED){
+                    // We did not get the permission.
+                    // Memorize this such that we don't ask again right now.
+                    hasUserDeniedPermissions = true;
                 }
+                break;
             }
         }
     }

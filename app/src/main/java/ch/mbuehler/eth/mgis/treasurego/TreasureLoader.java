@@ -1,15 +1,8 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.content.res.Resources;
 import android.location.Location;
-import android.os.Environment;
-import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,7 +11,19 @@ import java.util.ArrayList;
 import au.com.bytecode.opencsv.CSVReader;
 
 /**
- * This class is responsible for loading the treasures from the file system.
+ * This class is responsible for loading the treasures from a file.
+ * The CSV file with the treasures is stored a raw resource:
+ * app/src/main/res/raw/treasures.csv
+ *
+ * It should contain a header line, use ";" as separator and contain fields for
+ * treasure name,longitude,latitude,maximum coins
+ *
+ * Example:
+ *
+ * treasure name;longitude;latitude;maximum coins
+ * Noodle Soup;8.5085627239;47.410294559;3
+ * Potion of Endless Awakening;8.507075;47.408369;15
+ * Common Tavern Ale;8.506452;47.4075;1
  */
 class TreasureLoader {
 
@@ -75,10 +80,8 @@ class TreasureLoader {
         // Reward has to be an Integer
         int reward = Integer.parseInt(line[3]);
 
+        // The first entry is the name of the Treasure
         String name = line[0];
-
-        Treasure treasure = new Treasure(name, reward, location);
-
-        return treasure;
+        return new Treasure(name, reward, location);
     }
 }
