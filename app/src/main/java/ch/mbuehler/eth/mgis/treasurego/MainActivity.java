@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * The MainActivity welcomes the user and shows a list of Treasure objects. The user can select
@@ -61,6 +62,7 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
         GameStatus.Instance().reset(getApplicationContext());
         // Reload View
         updateTreasureListview();
+        Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
     }
 
     private void updateTreasureListview(){

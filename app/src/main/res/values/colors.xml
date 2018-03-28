@@ -6,4 +6,7 @@
     <color name="easyBlue">#c0c5ff</color>
     <color name="black">#000000</color>
     <color name="grey">#323232</color>
+    <color name="lightbrown">#F2B288</color>
+    <color name="darkbrown">#C25F1D</color>
+
 </resources>

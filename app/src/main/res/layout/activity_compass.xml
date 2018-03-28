@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_trans_1080x1920"
     tools:context="ch.mbuehler.eth.mgis.treasurego.CompassActivity">
 
 
@@ -43,8 +44,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/arrow"
-        tools:layout_editor_absoluteX="8dp"
-        >
+        tools:layout_editor_absoluteX="8dp">
 
         <TableRow>
 
@@ -67,9 +67,11 @@
                 tools:layout_editor_absoluteY="0dp" />
         </TableRow>
 
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
 
             <TextView
                 android:id="@+id/averageSpeedText"
@@ -86,8 +88,8 @@
                 android:layout_height="wrap_content"
                 android:layout_column="1"
                 android:layout_marginBottom="8dp"
-                android:inputType="numberDecimal"
                 android:text="@string/n.a." />
+
         </TableRow>
 
         <TableRow
@@ -191,6 +193,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/currentTemperatureValue"
                 app:layout_constraintRight_toRightOf="parent" />
         </TableRow>
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent">

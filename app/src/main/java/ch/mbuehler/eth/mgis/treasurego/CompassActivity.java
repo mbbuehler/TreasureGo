@@ -66,7 +66,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * When the user gets closer to the target Treasure than this value, we consider the Treasure as "found"
      */
-    private static final int DIST_TARGET_REACHED = 100; // in meters TODO: adjust
+    private static final int DIST_TARGET_REACHED = 20; // in meters TODO: adjust
 
     private boolean hasUserDeniedPermissions = false;
 

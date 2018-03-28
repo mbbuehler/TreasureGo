@@ -106,7 +106,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
             achievedReward = GameStatus.Instance().getMaxReward(treasureQuests.get(treasureUuid));
         }
 
-        String achievedRewardText = String.format("%d coins", achievedReward);
+        String achievedRewardText = String.format("%d", achievedReward);
         return achievedRewardText;
     }
 }
