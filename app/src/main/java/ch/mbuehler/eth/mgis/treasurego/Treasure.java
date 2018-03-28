@@ -18,11 +18,11 @@ public class Treasure implements Serializable{
     /**
      * Name of the treasure, that will be displayed to the user
      */
-    private String name;
+    private String name = "n.a";
     /**
      * Maximum reward obtainable when finding with treasure
      */
-    private int reward;
+    private int reward = 0;
     /**
      * Location of hidden treasure
      */
