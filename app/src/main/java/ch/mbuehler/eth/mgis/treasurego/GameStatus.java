@@ -132,5 +132,31 @@ public class GameStatus {
         Instance().hasBeenInitialized = hasBeenInitialized;
     }
 
+    /**
+     * Returns the total reward achieved since last reset.
+     * If a Treasure has been found several times, the maximum score
+     * for this Treasure is considered.
+     * @return int total reward
+     */
+    public int getTotalReward(){
+        int totalReward = 0;
+
+        // Iterate through the scores for all Treasures
+        for(String uuid: treasureQuests.keySet()){
+            ArrayList<Quest> quests = treasureQuests.get(uuid);
+            // We can have several Quests for the same Treasure.
+            // Extract the maximum reward achieved for this Treasure
+            int maxReward = 0;
+            for(Quest quest: quests){
+                if (quest.getReward() > maxReward){
+                    maxReward = quest.getReward();
+                }
+            }
+            // Sum up rewards
+            totalReward += maxReward;
+        }
+        return totalReward;
+    }
+
 
 }

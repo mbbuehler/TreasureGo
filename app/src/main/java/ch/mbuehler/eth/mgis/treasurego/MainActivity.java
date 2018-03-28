@@ -23,6 +23,11 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         // Do not reset the Treasures if we have already initalized them. This happens when we come
         // back to this Activity after finding a Treasure
@@ -35,6 +40,8 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
             // Treasures we have already found.
             updateTreasureListview();
         }
+        updateCurrentScore();
+
     }
 
     /**
@@ -69,7 +76,13 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
         // Set the listener that should wait for a user selection
         treasureListView.setOnItemClickListener(getOnTreasureSelectedListener());
 
-        TextView scoreView = findViewById(R.id.score);
+        TextView scoreView = findViewById(R.id.scoreValue);
+    }
+
+    private void updateCurrentScore(){
+        TextView scoreView = findViewById(R.id.scoreValue);
+        String scoreText = String.format("%d coins", GameStatus.Instance().getTotalReward());
+        scoreView.setText(scoreText);
     }
 
     /**

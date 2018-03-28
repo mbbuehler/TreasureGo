@@ -23,5 +23,8 @@
     <string name="cancel">Cancel</string>
     <string name="currentReward">Current reward <!--speed up to gain more)--></string>
     <string name="score">Score</string>
+    <string name="currentScore">Current score</string>
     <string name="pleasePermissions">Please allow TreasureGo all the required permissions. Thank you.</string>
+    <string name="welcome">Welcome to TreasureGo!</string>
+    <string name="chooseTreasure">Please choose a treasure</string>
 </resources>
