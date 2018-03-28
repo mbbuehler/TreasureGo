@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.HashMap;
 
 /**
  * Created by marcello on 28/03/18.
@@ -26,9 +26,9 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
      */
     private ArrayList<Treasure> treasures;
     /**
-     * List with uuids of Treasures that have been found by the user.
+     * HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
      */
-    private Set<String> uuidFoundTreasures;
+    private HashMap<String, ArrayList<Quest>> treasureQuests;
     /**
      * ApplicationContext
      */
@@ -39,21 +39,22 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
       */
     private static class ViewHolder {
         TextView nameText;  // Name of the Treasure
-        TextView rewardText;  // Maximum reward of the Treasure
+        TextView achievedRewardText;  // Achieved Reward for a given Treasure
+        TextView maxRewardText;  // Maximum reward of the Treasure
         ImageView image;  // Image of the Treasure
     }
 
     /**
      *
      * @param data The treasures to be displayed
-     * @param uuidFoundTreasures List with Treasure uuids that have been found already
+     * @param treasureQuests HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
      * @param context ApplicationContext
      */
-    TreasureAdapter(ArrayList<Treasure> data, Set<String> uuidFoundTreasures, Context context) {
+    TreasureAdapter(ArrayList<Treasure> data, HashMap<String, ArrayList<Quest>> treasureQuests, Context context) {
         super(context, R.layout.treasure_row, data);
         this.treasures = data;
-        this.uuidFoundTreasures = uuidFoundTreasures;
         this.mContext=context;
+        this.treasureQuests = treasureQuests;
     }
 
     @NonNull
@@ -72,7 +73,8 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
             convertView = inflater.inflate(R.layout.treasure_row, parent, false);
             // Set the required Text- and ImageViews
             viewHolder.nameText = convertView.findViewById(R.id.name);
-            viewHolder.rewardText = convertView.findViewById(R.id.MaxRewardValue);
+            viewHolder.achievedRewardText = convertView.findViewById(R.id.achievedReward);
+            viewHolder.maxRewardText = convertView.findViewById(R.id.MaxRewardValue);
             viewHolder.image = convertView.findViewById(R.id.item_info);
 
             convertView.setTag(viewHolder);
@@ -82,11 +84,12 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
         // Set the text values
         viewHolder.nameText.setText(treasure.getName());
-        viewHolder.rewardText.setText(Integer.valueOf(treasure.getReward()).toString());
+        viewHolder.achievedRewardText.setText(getAchievedRewardText(treasure.getUuid()));
+        viewHolder.maxRewardText.setText(Integer.valueOf(treasure.getReward()).toString());
 
         // Set the image
         // Choose Treasure picture depending on whether the Treasure has been found or not
-        if(uuidFoundTreasures.contains(treasure.getUuid())){
+        if(treasureQuests.keySet().contains(treasure.getUuid())){
             // The user has already found the Treasure
             viewHolder.image.setImageResource(R.drawable.treasure_open);
         } else{
@@ -95,5 +98,15 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
         }
         // Return the completed view
         return convertView;
+    }
+
+    private String getAchievedRewardText(String treasureUuid){
+        int achievedReward = 0;
+        if (treasureQuests.keySet().contains(treasureUuid)){
+            achievedReward = GameStatus.Instance().getMaxReward(treasureQuests.get(treasureUuid));
+        }
+
+        String achievedRewardText = String.format("%d coins", achievedReward);
+        return achievedRewardText;
     }
 }

@@ -27,4 +27,6 @@
     <string name="pleasePermissions">Please allow TreasureGo all the required permissions. Thank you.</string>
     <string name="welcome">Welcome to TreasureGo!</string>
     <string name="chooseTreasure">Please choose a treasure</string>
+    <string name="placeholder">Placeholder</string>
+    <string name="coins">coins</string>
 </resources>

@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
 
     private void updateTreasureListview(){
         // We use a custom Adapter such that we can display each Treasure with name, reward and an image
-        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getUuidTreasuresFound(), getApplicationContext());
+        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getTreasureQuests(), getApplicationContext());
 
         // This view holds the Treasures to be selected
         final ListView treasureListView = findViewById(R.id.treasurelistview);

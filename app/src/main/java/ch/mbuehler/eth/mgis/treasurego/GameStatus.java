@@ -27,11 +27,6 @@ public class GameStatus {
     private ArrayList<Treasure> allTreasures;
 
     /**
-     * List of the uuids of all Treasures that have already been discovered in this session.
-     */
-//    private ArrayList<String> uuidTreasuresFound;
-
-    /**
      * Contains data about previous Quests. For each Treasure we store all Quests that have
      * been finished for that Treasure
      * Key: uuid of Treasure
@@ -133,12 +128,29 @@ public class GameStatus {
     }
 
     /**
+     * We can have several Quests for the same Treasure.
+     * This method extracts the maximum reward achieved for a list of Quests.
+     * @param quests Quest
+     * @return int maximum reward found in quests
+     */
+    public int getMaxReward(ArrayList<Quest> quests){
+        int maxReward = 0;
+        // Iterate through quests to find maximum reward
+        for(Quest quest: quests){
+            if (quest.getReward() > maxReward){
+                maxReward = quest.getReward();
+            }
+        }
+        return maxReward;
+    }
+
+    /**
      * Returns the total reward achieved since last reset.
      * If a Treasure has been found several times, the maximum score
      * for this Treasure is considered.
      * @return int total reward
      */
-    public int getTotalReward(){
+    int getTotalReward(){
         int totalReward = 0;
 
         // Iterate through the scores for all Treasures
@@ -146,17 +158,14 @@ public class GameStatus {
             ArrayList<Quest> quests = treasureQuests.get(uuid);
             // We can have several Quests for the same Treasure.
             // Extract the maximum reward achieved for this Treasure
-            int maxReward = 0;
-            for(Quest quest: quests){
-                if (quest.getReward() > maxReward){
-                    maxReward = quest.getReward();
-                }
-            }
+            int maxReward = getMaxReward(quests);
             // Sum up rewards
             totalReward += maxReward;
         }
         return totalReward;
     }
 
-
+    HashMap<String, ArrayList<Quest>> getTreasureQuests() {
+        return treasureQuests;
+    }
 }
