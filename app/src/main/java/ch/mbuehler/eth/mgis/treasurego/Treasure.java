@@ -1,5 +1,6 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
+import android.content.Intent;
 import android.location.Location;
 import android.text.TextUtils;
 import java.util.UUID;
@@ -110,6 +111,17 @@ public class Treasure implements Serializable{
     public String serialize(){
         String[] data = new String[]{this.name, Integer.toString(this.reward), Double.toString(this.location.getLongitude()), Double.toString(this.location.getLatitude()), this.uuid};
         return TextUtils.join(Serializable.DELIMITER, data);
+    }
+
+    /**
+     * Creates a new Treasure with data from Intent.
+     * Key for StringExtra: MainActivity.TREASURE_KEY
+     * @param intent with StringExtra
+     * @return Treasure
+     */
+    public static Treasure unserializeTreasureFromIntent(Intent intent) {
+        String treasureSerialized = intent.getStringExtra(MainActivity.TREASURE_KEY);
+        return new Treasure(treasureSerialized);
     }
 
 }

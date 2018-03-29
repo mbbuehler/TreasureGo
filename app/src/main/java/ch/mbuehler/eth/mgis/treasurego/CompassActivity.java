@@ -146,25 +146,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * @return
      */
 
-    private double normalizeDegree(double value) {
-        double normalized;
-        // https://stackoverflow.com/questions/4308262/calculate-compass-bearing-heading-to-location-in-android
-        if (value >= 0.0d && value <= 180.0d) {
-            normalized = value;
-        } else {
-            normalized = 180 + (180 + value);
-        }
-        normalized = Math.min(360, normalized);
-        normalized = Math.max(0, normalized);
-        return normalized;
-    }
 
 
-    private Treasure unserializeTreasureFromIntent() {
-        Intent intent = getIntent();
-        String treasureSerialized = intent.getStringExtra(MainActivity.TREASURE_KEY);
-        return new Treasure(treasureSerialized);
-    }
+
+
 
 
 
@@ -254,56 +239,11 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         return this.targetTreasure;
     }
 
-    float getDirection() throws LocationNotFoundException {
-        // https://stackoverflow.com/questions/5479753/using-orientation-sensor-to-point-towards-a-specific-location
-
-        double azimuthRadians = orientation[0];
-        double azimuthDegrees = Math.toDegrees(azimuthRadians);
-
-        GeomagneticField geoField = new GeomagneticField(
-                Double.valueOf(this.getCurrentLocation().getLatitude()).floatValue(),
-                Double.valueOf(this.getCurrentLocation().getLongitude()).floatValue(),
-                Double.valueOf(this.getCurrentLocation().getAltitude()).floatValue(),
-                System.currentTimeMillis()
-        );
-
-        // Converting the magnetic North to the true North
-        float declination = geoField.getDeclination();
-        azimuthDegrees += declination;
-
-        // Get the bearing to the target location
-        float bearing = this.getCurrentLocation().bearingTo(this.targetLocation);
-
-        // Bearing gives us the angle to the destination in Degrees East of true North
-        double heading = (bearing - azimuthDegrees) * -1;
-        double normalizedHeading = normalizeDegree(heading);
-
-//        azimuthDegrees = (azimuthDegrees + 360) % 360;
-
-
-        boolean debug = false;
-        if (debug) {
-            Log.v("loc", String.format("Azimuth: %f", azimuthDegrees));
-            return (float) -azimuthDegrees;
-        }
-
-        // Calculate the direction for the arrow
-//        float direction = (float) azimuthDegrees - bearing;
-
-//        Log.v("loc", String.format("Bearing: %f", bearing));
-//        Log.v("loc", String.format("Azimuth: %f", azimuthDegrees));
-//        Log.v("loc", String.format("Heading: %f", heading));
-//        Log.v("loc", String.format("normalizedHeading: %f", normalizedHeading));
-//        Log.v("loc", String.format("Direction: %f", direction));
-        return -Double.valueOf(normalizedHeading).floatValue();
-
+    float getHeading() throws LocationNotFoundException {
+        Location currentLocation = getCurrentLocation();
+        Location targetLocation = getTargetLocation();
+        return HeadingCalculator.calculateHeading(orientation, currentLocation, targetLocation);
     }
-
-
-
-    /* ================== View Updates Section  ================== */
-
-
 
     /* ================== Event Section ================== */
 
@@ -316,7 +256,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         viewUpdater = new ViewUpdater(this);
 
         // Obtain target Treasure from Intent
-        this.targetTreasure = this.unserializeTreasureFromIntent();
+        this.targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
 
         this.targetLocation = this.targetTreasure.getLocation();
 
@@ -436,25 +376,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PermissionChecker.REQUEST_CODE_ASK_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Thank the user for granting permissions
-                    Toast.makeText(this, "Thank you and have fun!", Toast.LENGTH_SHORT).show();
-                    enableLocationUpdates();
-                    permissionChecker.setHasUserDeniedPermissions(false);
-//                    }
-                } else if(grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_DENIED){
-                    // We did not get the permission.
-                    // Memorize this such that we don't ask again right now.
-                    permissionChecker.setHasUserDeniedPermissions(true);
-                }
-                break;
-            }
-        }
+        permissionChecker.handleRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
 
@@ -465,7 +387,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * Requests Location updates from the locationManager. If there are missing permissions,
      * the user is asked to provide them.
      */
-    private void enableLocationUpdates() {
+    void enableLocationUpdates() {
         if(permissionChecker.isHasUserDeniedPermissions()){
             // The user has already denied permissions. Go back to MainActivity.
             Intent intent = new Intent(this, MainActivity.class);

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,5 +99,37 @@ class PermissionChecker {
      */
     void setHasUserDeniedPermissions(boolean hasUserDeniedPermissions) {
         this.hasUserDeniedPermissions = hasUserDeniedPermissions;
+    }
+
+    /**
+     * This method is called from CompassActivity
+     * after the user has responded to a permission request
+     *
+     * @param requestCode  requestCode from requestPermissions()
+     * @param permissions  not used
+     * @param grantResults tells us if the user has granted permissions or not
+     * @param activity reference to CompassActivity
+     */
+    void handleRequestPermissionsResult(
+            int requestCode, String permissions[], int[] grantResults, CompassActivity activity) {
+
+        switch (requestCode) {
+            case PermissionChecker.REQUEST_CODE_ASK_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Thank the user for granting permissions
+                    Toast.makeText(context, R.string.thanksHaveFun, Toast.LENGTH_SHORT).show();
+                    activity.enableLocationUpdates();
+                    setHasUserDeniedPermissions(false);
+                } else if(grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_DENIED){
+                    // We did not get the permission.
+                    // Memorize this such that we don't ask again right now.
+                    setHasUserDeniedPermissions(true);
+                }
+                break;
+            }
+        }
     }
 }

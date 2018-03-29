@@ -5,10 +5,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
- * Created by marcello on 29/03/18.
+ * This class handles View updates for the CompassActivity
  */
-
-public class ViewUpdater {
+class ViewUpdater {
 
     /**
      * Activity whose View will be updated
@@ -39,7 +38,8 @@ public class ViewUpdater {
         try {
             ImageView arrowView = activity.findViewById(R.id.arrow);
 
-            float direction = activity.getDirection();
+            // Multiply by (-1) in order to make the arrow face the correct way.
+            float direction = -1 * activity.getHeading();
 
 //                Log.v("loc", String.format("old Rot: %f / dir: %f", oldRotation, direction));
 //                RotateAnimation rotate = new RotateAnimation(arrowRotation, direction, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, .5f );
