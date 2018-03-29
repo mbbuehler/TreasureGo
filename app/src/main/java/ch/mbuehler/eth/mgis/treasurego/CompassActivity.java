@@ -69,7 +69,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * Responsible for updating the View elements, e.g. distance, time, etc.
      */
-    ViewUpdater viewUpdater;
+    CompassViewUpdater viewUpdater;
 
     /**
      * Max time between location updates
@@ -161,10 +161,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             onTargetLocationReached();
         } else if (distance > 1000) {
             // Display the distance in km
-            distanceText = Formatter.formatDouble(distance / 1000, 1) + " km";
+            distanceText = Formatter.formatDouble(distance / 1000, 1) + " " + getString(R.string.kilometers);
         } else {
             // Display the distance in m
-            distanceText = Formatter.formatDouble(distance, 1) + " m";
+            distanceText = Formatter.formatDouble(distance, 1) + " " + getString(R.string.meters);
         }
         // Update View
         viewUpdater.updateDistance(distanceText);
@@ -235,7 +235,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
         // Instantiate instance for permission checks and view updates
         permissionChecker = new PermissionChecker(this);
-        viewUpdater = new ViewUpdater(this);
+        viewUpdater = new CompassViewUpdater(this);
         locationTracker = new LocationTracker();
 
         // Obtain target Treasure from Intent
@@ -248,6 +248,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         // Update the field that names the target Treasure
         // We only need to do that once so we do it here.
         viewUpdater.updateSearchingFor();
+        // Call this at least once.
+        // This will make sure that in case that there is no sensor available
+        // we display the information to the user.
+        viewUpdater.updateTemperature();
 
         // Create the runnable responsible for regular updates
         CompassActivityRunnable runnable = new CompassActivityRunnable(timerHandler, viewUpdater);

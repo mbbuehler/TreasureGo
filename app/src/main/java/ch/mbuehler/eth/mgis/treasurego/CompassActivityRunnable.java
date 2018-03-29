@@ -16,7 +16,7 @@ public class CompassActivityRunnable implements Runnable {
     /**
      * Responsible for updating the View elements, e.g. distance, time, etc.
      */
-    private ViewUpdater viewUpdater;
+    private CompassViewUpdater viewUpdater;
     /**
      * Time since we last updated the arrow. Keeping track of this and delaying udpates
      * helps avoid constantly doing extremely similar computations
@@ -28,7 +28,7 @@ public class CompassActivityRunnable implements Runnable {
      */
     private final int SENSOR_DELAY = 500; // 500ms
 
-    CompassActivityRunnable(Handler timerHandler, ViewUpdater viewUpdater) {
+    CompassActivityRunnable(Handler timerHandler, CompassViewUpdater viewUpdater) {
         this.timerHandler = timerHandler;
         this.viewUpdater = viewUpdater;
     }

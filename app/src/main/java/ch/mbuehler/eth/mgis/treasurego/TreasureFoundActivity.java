@@ -1,6 +1,7 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -39,7 +40,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
      */
     private void updateView(){
         TextView rewardView = findViewById(R.id.reward);
-        String rewardText = String.format("+ %d coins", completedQuest.getReward());
+        String rewardText = String.format("+ %d %s", completedQuest.getReward(), getString(R.string.coins));
         rewardView.setText(rewardText);
 
         TextView treasureNameView = findViewById(R.id.treasureName);
@@ -47,13 +48,15 @@ public class TreasureFoundActivity extends AppCompatActivity {
         treasureNameView.setText(treasureNameText);
 
         TextView avgSpeedView = findViewById(R.id.averageSpeedValue);
-        String avgSpeedText = Formatter.formatDouble(completedQuest.getAvgSpeed(), 1) + " m/s";
+        String avgSpeedText = Formatter.formatDouble(completedQuest.getAvgSpeed(), 1) + getString(R.string.speedUnit);
         avgSpeedView.setText(avgSpeedText);
 
         TextView temperatureView = findViewById(R.id.temperatureValue);
-        String temperatureText = Formatter.formatDouble(completedQuest.getTemperature(), 1) + " \u2103";
-        temperatureView.setText(temperatureText);
+        TemperatureText temperatureText = new TemperatureText(this);
+        temperatureView.setText(temperatureText.getText(completedQuest.getTemperature()));
     }
+
+
 
     /**
      * Closes the app
