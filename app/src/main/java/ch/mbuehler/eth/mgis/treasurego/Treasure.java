@@ -94,11 +94,11 @@ public class Treasure implements Serializable{
     }
 
     /**
-     * Represents the Treasure using its name and maximum reward.
+     * Represents the Treasure using its name
      * @return String
      */
     public String toString(){
-        return String.format("%s (+%d)", this.name, this.reward);
+        return String.format("%s", this.name);
     }
 
     /**
