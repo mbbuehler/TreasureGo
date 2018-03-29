@@ -56,6 +56,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private Treasure targetTreasure;
 
+    ViewUpdater viewUpdater;
+
 
     /**
      * Time between location updates
@@ -70,13 +72,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private static final int DIST_TARGET_REACHED = 20; // in meters TODO: adjust
 
-
-    private long startTime = 0;
     private long lastMeasuredTime = 0;
     private boolean targetReached = false; // ignore Location updates after reaching target
 
     private final int SENSOR_DELAY = 500; // 500ms
-    private final int ARROW_UPDATE_DELAY = 500 * 1000000;  // in nanoseconds. 500ms
 
 
 
@@ -96,13 +95,13 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         // https://stackoverflow.com/questions/4597690/android-timer-how-to
         @Override
         public void run() {
-            updateAverageSpeed();
-            updateCurrentSpeed();
-            updateCurrentReward();
-            updateTime();
+            viewUpdater.updateAverageSpeed();
+            viewUpdater.updateCurrentSpeed();
+            viewUpdater.updateCurrentReward();
+            viewUpdater.updateTime();
 
             if (System.nanoTime() - lastMeasuredTime > 1000000000) {
-                updateArrow();
+                viewUpdater.updateArrow();
                 lastMeasuredTime = System.nanoTime();
             }
             timerHandler.postDelayed(this, SENSOR_DELAY);
@@ -180,7 +179,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private void handleTemperatureUpdate(float[] sensorValues) {
         this.currentTemperature = sensorValues[0];
-        this.updateTemperature();
+        viewUpdater.updateTemperature();
     }
 
     /**
@@ -215,26 +214,30 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             // Display the distance in m
             distanceText = Formatter.formatDouble(distance, 1) + " m";
         }
-        updateDistance(distanceText);
+        viewUpdater.updateDistance(distanceText);
     }
 
 
 
     /* ================== Getters and Setters Section  ================== */
 
+    public Location getTargetLocation() {
+        return targetLocation;
+    }
+
     public Location getCurrentLocation() throws LocationNotFoundException {
         if (this.areLocationServicesEnabled()) {
-            updateLocationNotFoundVisibility(View.GONE);
+            viewUpdater.updateLocationNotFoundVisibility(View.GONE);
             if (this.currentLocation != null) {
                 return this.currentLocation;
             }
         } else {
-            updateLocationNotFoundVisibility(View.VISIBLE);
+            viewUpdater.updateLocationNotFoundVisibility(View.VISIBLE);
         }
         throw new LocationNotFoundException("Location was not found.");
     }
 
-    private double getAverageSpeed() {
+    double getAverageSpeed() {
         return this.locationTracker.getAverageSpeed();
     }
 
@@ -243,15 +246,15 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      *
      * @return
      */
-    private float getCurrentTemperature() {
+    float getCurrentTemperature() {
         return this.currentTemperature;
     }
 
-    private Treasure getTargetTreasure() {
+    Treasure getTargetTreasure() {
         return this.targetTreasure;
     }
 
-    public float getDirection() throws LocationNotFoundException {
+    float getDirection() throws LocationNotFoundException {
         // https://stackoverflow.com/questions/5479753/using-orientation-sensor-to-point-towards-a-specific-location
 
         double azimuthRadians = orientation[0];
@@ -300,93 +303,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     /* ================== View Updates Section  ================== */
 
-    private void updateArrow() {
-        try {
-            ImageView arrowView = findViewById(R.id.arrow);
-
-            float direction = this.getDirection();
-
-//                Log.v("loc", String.format("old Rot: %f / dir: %f", oldRotation, direction));
-//                RotateAnimation rotate = new RotateAnimation(arrowRotation, direction, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, .5f );
-//
-//                arrowRotation = direction;
-////                        new RotateAnimation(oldRotation, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                rotate.setDuration(ARROW_UPDATE_DELAY * 2 / 1000000); //Math.round(Math.abs(arrowRotation - direction)/360*500));
-//                rotate.setInterpolator(new LinearInterpolator());
-//                arrowView.startAnimation(rotate);
-//
-            arrowView.setRotation(direction);
-
-
-        } catch (LocationNotFoundException e) {
-            updateLocationNotFoundVisibility(View.VISIBLE);
-        }
-
-    }
-
-    private void updateSearchingFor() {
-        TextView searchingForView = (TextView) findViewById(R.id.searchingForValue);
-        searchingForView.setText(this.targetTreasure.toString());
-    }
-
-    private void updateAverageSpeed() {
-        double averageSpeed = this.getAverageSpeed();
-        TextView avgSpeedView = (TextView) findViewById(R.id.averageSpeedValue);
-        avgSpeedView.setText(Formatter.formatDouble(averageSpeed, 1) + " m/s");
-    }
-
-    private void updateCurrentSpeed() {
-        TextView currentSpeedView = (TextView) findViewById(R.id.currentSpeedValue);
-        String text = "";
-
-        try {
-            float currentSpeed = this.getCurrentLocation().getSpeed();
-            text = Formatter.formatDouble(currentSpeed, 1)+ " m/s";
-        } catch (LocationNotFoundException e) {
-            text = "n.a.";
-        } finally {
-            currentSpeedView.setText(text);
-        }
-    }
-
-    private void updateDistance(String text) {
-        TextView distanceView = (TextView) findViewById(R.id.distanceValue);
-        distanceView.setText(text);
-    }
-
-    private void updateTemperature() {
-        // TODO: handle case if temperature is not available.
-        float currentTemperature = this.currentTemperature;
-        TextView temperatureView = (TextView) findViewById(R.id.currentTemperatureValue);
-        String temperatureString = Formatter.formatDouble(currentTemperature, 1) + " \u2103";
-        temperatureView.setText(temperatureString);
-    }
-
-    private void updateTime() {
-        long millis = System.currentTimeMillis() - startTime;
-        int seconds = (int) (millis / 1000);
-        int minutes = seconds / 60;
-        int hours = minutes / 60;
-        seconds = seconds % 60;
-        minutes = minutes % 60;
-
-        TextView timerTextView = findViewById(R.id.timePassedValue);
-        timerTextView.setText(String.format("%d:%02d:%02d", hours, minutes, seconds));
-    }
-
-    private void updateCurrentReward() {
-        int currentReward = RewardCalculator.calculateReward(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature());
-        TextView currentRewardView = findViewById(R.id.CurrentRewardValue);
-        String text = String.format("%d coins", currentReward);
-        currentRewardView.setText(text);
-    }
-
-    private void updateLocationNotFoundVisibility(int visibility) {
-        TextView locationNotFound = findViewById(R.id.errorText);
-        if (locationNotFound.getVisibility() != visibility) {
-            locationNotFound.setVisibility(visibility);
-        }
-    }
 
 
     /* ================== Event Section ================== */
@@ -397,6 +313,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         setContentView(R.layout.activity_compass);
 
         permissionChecker = new PermissionChecker(this);
+        viewUpdater = new ViewUpdater(this);
 
         // Obtain target Treasure from Intent
         this.targetTreasure = this.unserializeTreasureFromIntent();
@@ -405,7 +322,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
         this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        this.startTime = System.currentTimeMillis();
         timerHandler.postDelayed(timerRunnable, 0);
 
         this.locationTracker = new LocationTracker();
@@ -414,7 +330,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
         this.sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
 
-        updateSearchingFor();
+        viewUpdater.updateSearchingFor();
     }
 
     @Override

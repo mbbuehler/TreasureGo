@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
             // Don't display Toast if we are loading the Treasures for the first time
             Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void updateTreasureListview(){
