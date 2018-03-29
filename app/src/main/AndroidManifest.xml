@@ -13,15 +13,33 @@
         android:roundIcon="@drawable/treasurego_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-        <activity android:name=".MainActivity" android:screenOrientation="portrait">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/googleMapsKey" />
+
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CompassActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".TreasureFoundActivity" android:screenOrientation="portrait"/>
+        <activity
+            android:name=".CompassActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TreasureFoundActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/title_activity_maps">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.mbuehler.eth.mgis.treasurego.CompassActivity" />
+        </activity>
     </application>
 
 </manifest>

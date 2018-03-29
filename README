@@ -10,6 +10,7 @@ Have fun!
 Please Note
 =========
 - The arrow pointing to the target Treasure is not reliable when you get close to the Treasure (within 20-50 meters). This is due to inaccuracies of the estimated Locations. If the arrow does not work well for further distance, you can calibrate your sensors.
+- When you get closer than 20m to the Target, you will have "found" it.
 
 Android SDK Version
 =========

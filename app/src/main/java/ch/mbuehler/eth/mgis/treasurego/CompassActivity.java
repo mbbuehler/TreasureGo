@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * This activity guides the user to find Treasures.
@@ -308,6 +309,18 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     public void onAbort(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    public void onMapButtonClicked(View view){
+        view.setEnabled(false);
+
+        Intent intent = new Intent(this, MapsActivity.class);
+        // Serialize and send the target Treasure with the Intent.
+        String serializedTreasure = getTargetTreasure().serialize();
+        intent.putExtra(MainActivity.TREASURE_KEY, serializedTreasure);
+        startActivity(intent);
+
+        Toast.makeText(this, R.string.hintInfo, Toast.LENGTH_LONG).show();
     }
 
     /**
