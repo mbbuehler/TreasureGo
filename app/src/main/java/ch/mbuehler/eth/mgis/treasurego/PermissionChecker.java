@@ -32,7 +32,7 @@ class PermissionChecker {
     private Context context;
 
     /**
-     *  Holds permissions that we need to ask permissions for.
+     * Holds permissions that we need to ask permissions for.
      */
     private List<String> permissionsList = new ArrayList<>();
 
@@ -45,6 +45,7 @@ class PermissionChecker {
 
     /**
      * Checks the required permissions and requests them if needed.
+     *
      * @param permissions String[] with Manifest.permission.*
      *                    e.g. [Manifest.permission.ACCESS_FINE_LOCATION]
      */
@@ -65,7 +66,7 @@ class PermissionChecker {
      * Checks if permission has been granted. If not the permission code is added to permissionList
      * https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
      *
-     * @param permission      Manifest.permission.*
+     * @param permission Manifest.permission.*
      * @return true if permission has been granted and false otherwise
      */
     private boolean addPermission(String permission) {
@@ -111,8 +112,8 @@ class PermissionChecker {
      * @param requestCode  requestCode from requestPermissions()
      * @param permissions  not used
      * @param grantResults tells us if the user has granted permissions or not
-     * @param actionable reference to PermissionActionable specifying
-     *                   what to to in case permissions have been granted / denied
+     * @param actionable   reference to PermissionActionable specifying
+     *                     what to to in case permissions have been granted / denied
      */
     void handleRequestPermissionsResult(
             int requestCode, String permissions[], int[] grantResults, PermissionActionable actionable) {
@@ -131,11 +132,11 @@ class PermissionChecker {
                         PackageManager.PERMISSION_DENIED) {
                     // We did not get the permission.
                     // Memorize this such that we don't ask again right now.
-                    if(!hasUserDeniedPermissions()){
+                    if (!hasUserDeniedPermissions()) {
                         // It was the first time we asked
                         setHasUserDeniedPermissions(true);
                         actionable.onPermissionDenied();
-                    }else if(hasUserDeniedPermissions() && !hasUserDeniedPermissionsTwice()){
+                    } else if (hasUserDeniedPermissions() && !hasUserDeniedPermissionsTwice()) {
                         // The user has denied permissions once. Ask once more
                         setHasUserDeniedPermissionsTwice(true);
                         actionable.onPermissionDeniedTwice();

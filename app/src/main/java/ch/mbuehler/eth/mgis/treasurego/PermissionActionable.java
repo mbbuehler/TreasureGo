@@ -7,6 +7,8 @@ package ch.mbuehler.eth.mgis.treasurego;
 public interface PermissionActionable {
 
     void onPermissionGranted();
+
     void onPermissionDenied();
+
     void onPermissionDeniedTwice();
 }

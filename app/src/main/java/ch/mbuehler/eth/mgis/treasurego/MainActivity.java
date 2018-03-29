@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     /**
      * OnClickListener. Is executed when the user presses the reset Button.
+     *
      * @param view
      */
     public void loadTreasures(View view) {

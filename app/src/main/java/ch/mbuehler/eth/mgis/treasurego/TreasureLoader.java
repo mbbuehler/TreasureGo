@@ -3,7 +3,6 @@ package ch.mbuehler.eth.mgis.treasurego;
 import android.content.Context;
 import android.location.Location;
 import android.os.Environment;
-import android.renderscript.ScriptGroup;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +41,7 @@ class TreasureLoader {
 
     /**
      * Loads CSV File, creates Treasure instances and returns them as ArrayList.
-     *
+     * <p>
      * The CSV File named "treasure.csv" may be located in the external storage directory.
      * If there is no File available in the external storage directory, a default
      * File will be loaded from the app's raw resources.
@@ -83,22 +82,24 @@ class TreasureLoader {
      * Creates an InputStream from a File in the root of the external Storage Directory
      * If not File is located, we throw a FileNotFoundException
      * The file name has to be "treasure.csv"
+     *
      * @return InputStream
      * @throws FileNotFoundException if no File has been found
      */
-    private InputStream getInputStreamFromExternalStorage() throws FileNotFoundException{
-            File directory = Environment.getExternalStorageDirectory();
-            File file = new File(directory, "treasure.csv");
-            return new FileInputStream(file);
+    private InputStream getInputStreamFromExternalStorage() throws FileNotFoundException {
+        File directory = Environment.getExternalStorageDirectory();
+        File file = new File(directory, "treasure.csv");
+        return new FileInputStream(file);
     }
 
     /**
      * Creates an InputStream from a File in the raw resource directory of this app.
      * Path:
      * app/src/main/res/raw/treasures.csv
+     *
      * @return InputStream
      */
-    private InputStream getInputStreamFromRawResource(){
+    private InputStream getInputStreamFromRawResource() {
         return context.getResources().openRawResource(R.raw.treasures);
     }
 
@@ -106,13 +107,14 @@ class TreasureLoader {
      * Creates an InputStream.
      * If a File could be located in the external storage directory, this file is loaded.
      * If not File could be located, the default File from the Apps raw resources is loaded.
+     *
      * @return InputStream
      */
-    private InputStream getInputStream(){
+    private InputStream getInputStream() {
         InputStream stream;
-        try{
+        try {
             stream = getInputStreamFromExternalStorage();
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             stream = getInputStreamFromRawResource();
         }
         return stream;
