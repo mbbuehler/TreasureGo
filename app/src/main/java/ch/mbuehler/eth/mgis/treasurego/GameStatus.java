@@ -61,7 +61,7 @@ public class GameStatus {
      */
     void reset(Context context) {
         // Load all treasures from file
-        ArrayList<Treasure> allTreasures = new TreasureLoader().loadTreasures(context);
+        ArrayList<Treasure> allTreasures = new TreasureLoader(context).loadTreasures();
         Instance().setAllTreasures(allTreasures);
 
         // Initialize as empty ArrayList

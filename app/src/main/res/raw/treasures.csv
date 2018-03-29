@@ -1,14 +1,12 @@
-treasure name,longitude,latitude,maximum coins
-Altried,8.5841652,47.4050926,100
-Glattzentrum,8.5862252,47.406806,20
-Bethselaminian Backpack,8.5073332245,47.4083037229,150
-Staff of the Forlorn Traveler,8.5064963753,47.4082229913,120
-Light Crossbow,8.5073005726,47.4079093986,25
-Great Boarhunter's Spear,8.5079335739,47.4079960404,50
-The Mighty Dragon's Golden Heart,8.5099456577,47.4083282105,250
-One Big Juicy Chicken Leg,8.5095799365,47.4078553941,5
-An Engineer's Essential Toolkit,8.5082726463,47.4074449376,75
-Fast Warhorse,8.5077616906,47.4090014008,80
-Noodle Soup,8.5085627239,47.410294559,3
-Potion of Endless Awakening,8.507075,47.408369,15
-Common Tavern Ale,8.506452,47.4075,1
+treasure name;longitude;latitude;maximum coins
+Bethselaminian Backpack;8.507333224490367;47.40830372291337;150
+Staff of the Forlorn Traveler;8.50649637527772;47.40822299131271;120
+Light Crossbow;8.50730057256942;47.40790939857302;25
+Great Boarhunter's Spear;8.507933573896935;47.4079960404438;50
+The Mighty Dragon's Golden Heart;8.509945657737944;47.40832821045744;250
+One Big Juicy Chicken Leg;8.50957993646034;47.40785539412631;5
+An Engineer's Essential Toolkit;8.508272646252863;47.40744493757253;75
+Fast Warhorse;8.507761690601683;47.409001400825936;80
+Noodle Soup;8.508562723852833;47.410294559025175;3
+Potion of Endless Awakening;8.507075;47.408369;15
+Common Tavern Ale;8.506452;47.407500;1

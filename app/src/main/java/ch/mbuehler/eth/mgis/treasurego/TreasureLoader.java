@@ -2,7 +2,12 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Environment;
+import android.renderscript.ScriptGroup;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,22 +31,33 @@ import au.com.bytecode.opencsv.CSVReader;
  * Common Tavern Ale;8.506452;47.4075;1
  */
 class TreasureLoader {
+    /**
+     * Context / Activity
+     */
+    Context context;
+
+    public TreasureLoader(Context context) {
+        this.context = context;
+    }
 
     /**
-     * Loads CSV file, creates Treasure instances and returns them as ArrayList
+     * Loads CSV File, creates Treasure instances and returns them as ArrayList.
      *
-     * @param context
+     * The CSV File named "treasure.csv" may be located in the external storage directory.
+     * If there is no File available in the external storage directory, a default
+     * File will be loaded from the app's raw resources.
+     *
      * @return ArrayList of Treasure
      */
-    ArrayList<Treasure> loadTreasures(Context context) {
+    ArrayList<Treasure> loadTreasures() {
         // treasures will hold all Treasure objects
-        ArrayList<Treasure> treasures = new ArrayList<Treasure>();
+        ArrayList<Treasure> treasures = new ArrayList<>();
+
+        InputStream stream;
 
         try {
             // Prepare reading the CSV file
-            // The CSV file with the treasures is stored a raw resource:
-            // app/src/main/res/raw/treasures.csv
-            InputStream stream = context.getResources().openRawResource(R.raw.treasures2);
+            stream = getInputStream();
             InputStreamReader reader = new InputStreamReader(stream);
             CSVReader csvReader = new CSVReader(reader, ';');
 
@@ -61,6 +77,45 @@ class TreasureLoader {
             e.printStackTrace();
         }
         return treasures;
+    }
+
+    /**
+     * Creates an InputStream from a File in the root of the external Storage Directory
+     * If not File is located, we throw a FileNotFoundException
+     * The file name has to be "treasure.csv"
+     * @return InputStream
+     * @throws FileNotFoundException if no File has been found
+     */
+    private InputStream getInputStreamFromExternalStorage() throws FileNotFoundException{
+            File directory = Environment.getExternalStorageDirectory();
+            File file = new File(directory, "treasure.csv");
+            return new FileInputStream(file);
+    }
+
+    /**
+     * Creates an InputStream from a File in the raw resource directory of this app.
+     * Path:
+     * app/src/main/res/raw/treasures.csv
+     * @return InputStream
+     */
+    private InputStream getInputStreamFromRawResource(){
+        return context.getResources().openRawResource(R.raw.treasures);
+    }
+
+    /**
+     * Creates an InputStream.
+     * If a File could be located in the external storage directory, this file is loaded.
+     * If not File could be located, the default File from the Apps raw resources is loaded.
+     * @return InputStream
+     */
+    private InputStream getInputStream(){
+        InputStream stream;
+        try{
+            stream = getInputStreamFromExternalStorage();
+        } catch (FileNotFoundException e){
+            stream = getInputStreamFromRawResource();
+        }
+        return stream;
     }
 
     /**
