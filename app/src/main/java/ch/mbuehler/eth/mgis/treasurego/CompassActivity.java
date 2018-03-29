@@ -21,27 +21,27 @@ import android.widget.Toast;
 
 /**
  * This activity guides the user to find Treasures.
- *
+ * <p>
  * There are a lot of things happening in this Activity.
  * In order to make this class as lightweight as possible,
  * most business logic has been extracted into other classes.
  * However, this class still has to manage the interplay between a number of components.
- *
+ * <p>
  * In order to make navigation within this class as easy as possible,
  * it has been structured into the following sections:
- *
+ * <p>
  * 1. Sensor Updates Section
- *    Sensor updates need to be processed.
- *    This section deals with the business logic for Sensor updates.
- *
+ * Sensor updates need to be processed.
+ * This section deals with the business logic for Sensor updates.
+ * <p>
  * 2. Getters and Setters Section:
- *    Getters and Setters for this class.
- *
+ * Getters and Setters for this class.
+ * <p>
  * 3. Event Section:
- *    This section has methods that deal with events, e.g. onCreate() or onResume().
- *
+ * This section has methods that deal with events, e.g. onCreate() or onResume().
+ * <p>
  * 4. LocationUpdates Section:
- *    This section deals with Location updates.
+ * This section deals with Location updates.
  */
 public class CompassActivity extends AppCompatActivity implements LocationListener, SensorEventListener {
 
@@ -126,6 +126,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     /**
      * Extracts the measured temperature from the sensor values and updates the View.
+     *
      * @param sensorValues values from the Temperature Sensor
      */
     private void handleTemperatureUpdate(float[] sensorValues) {
@@ -308,6 +309,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * User has clicked the back button.
      * Will redirect the user to MainActivity.
+     *
      * @param view
      */
     public void onAbort(View view) {
@@ -340,6 +342,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * Listener for Sensor updates.
      * Handles each Sensor separately.
+     *
      * @param sensorEvent can be from any sensor
      */
     @Override

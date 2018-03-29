@@ -24,10 +24,10 @@ public class Quest {
     private QuestStatus status;
 
     /**
-     * @param treasure Target Treasure
-     * @param avgSpeed average speed achieved in this Quest
+     * @param treasure    Target Treasure
+     * @param avgSpeed    average speed achieved in this Quest
      * @param temperature degrees Celsius
-     * @param status COMPLETED
+     * @param status      COMPLETED
      */
     public Quest(Treasure treasure, double avgSpeed, float temperature, QuestStatus status) {
         this.treasure = treasure;
@@ -70,9 +70,10 @@ public class Quest {
 
     /**
      * Calculates the reward achieved for this Quest
+     *
      * @return int number of coins received
      */
-    public int getReward(){
+    public int getReward() {
         return RewardCalculator.calculateReward(getTreasure(), getAvgSpeed(), getTemperature());
     }
 }

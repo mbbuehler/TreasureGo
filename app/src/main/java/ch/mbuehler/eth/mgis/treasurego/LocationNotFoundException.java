@@ -5,7 +5,7 @@ package ch.mbuehler.eth.mgis.treasurego;
  */
 class LocationNotFoundException extends Exception {
 
-    LocationNotFoundException(String message){
+    LocationNotFoundException(String message) {
         super(message);
     }
 }

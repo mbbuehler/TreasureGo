@@ -1,7 +1,6 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -38,7 +37,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
     /**
      * Updates all the fields displayed in the View
      */
-    private void updateView(){
+    private void updateView() {
         TextView rewardView = findViewById(R.id.reward);
         String rewardText = String.format("+ %d %s", completedQuest.getReward(), getString(R.string.coins));
         rewardView.setText(rewardText);
@@ -57,21 +56,22 @@ public class TreasureFoundActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * Closes the app
+     *
      * @param view
      */
-    public void closeApp(View view){
+    public void closeApp(View view) {
         Toast.makeText(this, R.string.thanksBye, Toast.LENGTH_SHORT);
         System.exit(0);
     }
 
     /**
      * Redirects the user to MainActivity such that the game can be restarted with a new treasure.
+     *
      * @param view
      */
-    public void playAgain(View view){
+    public void playAgain(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

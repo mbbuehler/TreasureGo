@@ -13,6 +13,7 @@ interface Serializable {
 
     /**
      * Serializes relevant attributes of the class and returns a String containing the attribute values.
+     *
      * @return String
      */
     String serialize();

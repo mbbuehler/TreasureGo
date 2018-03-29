@@ -14,12 +14,12 @@ import au.com.bytecode.opencsv.CSVReader;
  * This class is responsible for loading the treasures from a file.
  * The CSV file with the treasures is stored a raw resource:
  * app/src/main/res/raw/treasures.csv
- *
+ * <p>
  * It should contain a header line, use ";" as separator and contain fields for
  * treasure name,longitude,latitude,maximum coins
- *
+ * <p>
  * Example:
- *
+ * <p>
  * treasure name;longitude;latitude;maximum coins
  * Noodle Soup;8.5085627239;47.410294559;3
  * Potion of Endless Awakening;8.507075;47.408369;15
@@ -29,14 +29,15 @@ class TreasureLoader {
 
     /**
      * Loads CSV file, creates Treasure instances and returns them as ArrayList
+     *
      * @param context
      * @return ArrayList of Treasure
      */
-    ArrayList<Treasure> loadTreasures(Context context){
+    ArrayList<Treasure> loadTreasures(Context context) {
         // treasures will hold all Treasure objects
         ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 
-        try{
+        try {
             // Prepare reading the CSV file
             // The CSV file with the treasures is stored a raw resource:
             // app/src/main/res/raw/treasures.csv
@@ -51,11 +52,11 @@ class TreasureLoader {
             csvReader.readNext();
 
             // Iterate through the CSV file and create one Treasure per line
-            while((line = csvReader.readNext()) != null){
+            while ((line = csvReader.readNext()) != null) {
                 Treasure treasure = this.createTreasure(line);
                 treasures.add(treasure);
             }
-        } catch(IOException e){
+        } catch (IOException e) {
             // There was a problem when reading the file
             e.printStackTrace();
         }
@@ -63,13 +64,12 @@ class TreasureLoader {
     }
 
     /**
-     *
      * @param line Parsed line from CSV file.
-     * Expected fields: treasure name;longitude;latitude;maximum coins
-     * Example content: ["Bethselaminian", "Backpack", "8.50", "47.40", "50"]
+     *             Expected fields: treasure name;longitude;latitude;maximum coins
+     *             Example content: ["Bethselaminian", "Backpack", "8.50", "47.40", "50"]
      * @return Treasure
      */
-    private Treasure createTreasure(String[] line){
+    private Treasure createTreasure(String[] line) {
         // Longitude and latitude need to be converted to Double
         double lng = Double.parseDouble(line[1]);
         double lat = Double.parseDouble(line[2]);

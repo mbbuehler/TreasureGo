@@ -29,7 +29,6 @@ class CompassViewUpdater {
     private final int ARROW_UPDATE_DELAY = 500 * 1000000;  // in nanoseconds. 500ms
 
     /**
-     *
      * @param activity Activity whose View will be updated
      */
     CompassViewUpdater(CompassActivity activity) {
@@ -97,7 +96,7 @@ class CompassViewUpdater {
 
         try {
             float currentSpeed = activity.getCurrentLocation().getSpeed();
-            text = Formatter.formatDouble(currentSpeed, 1)+ " " + activity.getString(R.string.speedUnit);
+            text = Formatter.formatDouble(currentSpeed, 1) + " " + activity.getString(R.string.speedUnit);
         } catch (LocationNotFoundException e) {
             text = activity.getString(R.string.n_a_);
         } finally {
@@ -107,6 +106,7 @@ class CompassViewUpdater {
 
     /**
      * Updates the field for distance
+     *
      * @param text pre-formatted text for distance
      */
     void updateDistance(String text) {
@@ -121,7 +121,7 @@ class CompassViewUpdater {
         // TODO: handle case if temperature is not available.
         float currentTemperature = activity.getCurrentTemperature();
         TextView temperatureView = activity.findViewById(R.id.currentTemperatureValue);
-        String temperatureString =  temperatureText.getText(currentTemperature);
+        String temperatureString = temperatureText.getText(currentTemperature);
         temperatureView.setText(temperatureString);
     }
 
@@ -156,6 +156,7 @@ class CompassViewUpdater {
 
     /**
      * Show error message when Location could not be identified.
+     *
      * @param visibility View.* e.g. View.GONE
      */
     void updateLocationNotFoundVisibility(int visibility) {

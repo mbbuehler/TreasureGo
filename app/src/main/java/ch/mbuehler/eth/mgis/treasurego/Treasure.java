@@ -3,13 +3,14 @@ package ch.mbuehler.eth.mgis.treasurego;
 import android.content.Intent;
 import android.location.Location;
 import android.text.TextUtils;
+
 import java.util.UUID;
 
 
 /**
  * This class represents a Treasure object.
  */
-public class Treasure implements Serializable{
+public class Treasure implements Serializable {
 
     /**
      * Make Treasure objects identifiable via a uuid
@@ -31,11 +32,12 @@ public class Treasure implements Serializable{
 
     /**
      * Constructor for treasure
-     * @param name name of the treasure
-     * @param reward maximum reward for this treasure
+     *
+     * @param name     name of the treasure
+     * @param reward   maximum reward for this treasure
      * @param location location of this treasure
      */
-    Treasure(String name, int reward, Location location){
+    Treasure(String name, int reward, Location location) {
         this.setName(name);
         this.setReward(reward);
         this.location = location;
@@ -44,9 +46,10 @@ public class Treasure implements Serializable{
     /**
      * Constructor that is fed with a serialized treasure.
      * See this.serialize for the encoding of the attributes.
+     *
      * @param serializedData serialized treasure data
      */
-    Treasure(String serializedData){
+    Treasure(String serializedData) {
         String[] data = serializedData.split(";");
         this.name = data[0];
         this.reward = Integer.parseInt(data[1]);
@@ -75,12 +78,13 @@ public class Treasure implements Serializable{
 
     /**
      * Sets the reward for this Treasure. If a negative value is provided, the reward is set to 0.
+     *
      * @param reward positive integer
      */
     public void setReward(int reward) {
-        if (reward < 0){
+        if (reward < 0) {
             this.reward = 0;
-        } else{
+        } else {
             this.reward = reward;
         }
     }
@@ -95,9 +99,10 @@ public class Treasure implements Serializable{
 
     /**
      * Represents the Treasure using its name
+     *
      * @return String
      */
-    public String toString(){
+    public String toString() {
         return String.format("%s", this.name);
     }
 
@@ -106,9 +111,10 @@ public class Treasure implements Serializable{
      * name,reward,longitude,latitude,uuid
      * i.e. "Fast Warhorse;80;8.5077616906;47.4090014008;8eccd1a3-3b10-4c7b-9bc1-3786d9d60dc5"
      * The delimiter is determined by the Serializable Interface.
+     *
      * @return String
      */
-    public String serialize(){
+    public String serialize() {
         String[] data = new String[]{this.name, Integer.toString(this.reward), Double.toString(this.location.getLongitude()), Double.toString(this.location.getLatitude()), this.uuid};
         return TextUtils.join(Serializable.DELIMITER, data);
     }
@@ -116,6 +122,7 @@ public class Treasure implements Serializable{
     /**
      * Creates a new Treasure with data from Intent.
      * Key for StringExtra: MainActivity.TREASURE_KEY
+     *
      * @param intent with StringExtra
      * @return Treasure
      */

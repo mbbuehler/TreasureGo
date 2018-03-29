@@ -32,7 +32,7 @@ class PermissionChecker {
     private Context context;
 
     /**
-     *  All required permissions
+     * All required permissions
      */
     private static String[] permissions = new String[]{
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -43,7 +43,6 @@ class PermissionChecker {
     };
 
     /**
-     *
      * @param context Activity. Make sure to pass the Activity as "this" (not getApplicationContext())
      */
     PermissionChecker(Context context) {
@@ -60,7 +59,7 @@ class PermissionChecker {
         // Holds permissions that we need to ask permissions for.
         final List<String> permissionsList = new ArrayList<>();
         // Add permissions that we don't have yet
-        for(String permission: permissions){
+        for (String permission : permissions) {
             addPermission(permissionsList, permission);
         }
 
@@ -71,12 +70,12 @@ class PermissionChecker {
     }
 
 
-
     /**
      * Checks if permission has been granted. If not the permission code is added to permissionList
      * https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
+     *
      * @param permissionsList final List where we add permissions that have not been granted
-     * @param permission Manifest.permission.*
+     * @param permission      Manifest.permission.*
      * @return true if permission has been granted and false otherwise
      */
     private boolean addPermission(List<String> permissionsList, String permission) {
@@ -108,7 +107,7 @@ class PermissionChecker {
      * @param requestCode  requestCode from requestPermissions()
      * @param permissions  not used
      * @param grantResults tells us if the user has granted permissions or not
-     * @param activity reference to CompassActivity
+     * @param activity     reference to CompassActivity
      */
     void handleRequestPermissionsResult(
             int requestCode, String permissions[], int[] grantResults, CompassActivity activity) {
@@ -122,8 +121,8 @@ class PermissionChecker {
                     Toast.makeText(context, R.string.thanksHaveFun, Toast.LENGTH_SHORT).show();
                     activity.enableLocationUpdates();
                     setHasUserDeniedPermissions(false);
-                } else if(grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_DENIED){
+                } else if (grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_DENIED) {
                     // We did not get the permission.
                     // Memorize this such that we don't ask again right now.
                     setHasUserDeniedPermissions(true);

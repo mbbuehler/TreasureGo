@@ -40,6 +40,7 @@ class LocationTracker {
 
     /**
      * Adds one Location sample to the tracked samples
+     *
      * @param location
      */
     void addSample(Location location) {
@@ -50,6 +51,7 @@ class LocationTracker {
 
     /**
      * Distance to last sample location saved.
+     *
      * @param newLocation Location
      * @return Distance in meters. 0 if we have no measurements.
      */
@@ -80,8 +82,9 @@ class LocationTracker {
      * Calculates the smoothed distance of the last known location to the target location.
      * This is required because the noisy sensors might cause "jumps" in locations such that we
      * get a location that is very close to the target although we are still some distance away.
-     *
+     * <p>
      * Smoothing means that we calculate the median of the last N_SMOOTHING_LOCATIONS.
+     *
      * @param targetLocation
      * @return smoothed distance
      */
@@ -108,6 +111,7 @@ class LocationTracker {
     /**
      * Helper method to calculate the median from an ArrayList of doubles.
      * https://stackoverflow.com/questions/41117879/problems-finding-median-of-arraylist
+     *
      * @param arrayList of doubles
      * @return median of arrayList
      */

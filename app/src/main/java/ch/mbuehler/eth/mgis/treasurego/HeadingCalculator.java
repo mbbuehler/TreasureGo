@@ -12,9 +12,10 @@ class HeadingCalculator {
      * Calculates the heading to the target Location.
      * Adapted from
      * https://stackoverflow.com/questions/5479753/using-orientation-sensor-to-point-towards-a-specific-location
-     * @param orientation  orientation vector from SensorManager.getOrientation(mRotationMatrix, orientation)
+     *
+     * @param orientation     orientation vector from SensorManager.getOrientation(mRotationMatrix, orientation)
      * @param currentLocation current Location
-     * @param targetLocation target Location
+     * @param targetLocation  target Location
      * @return 0 <= angle <= 359 to target Location
      */
     static float calculateHeading(float[] orientation, Location currentLocation, Location targetLocation) {
@@ -41,10 +42,11 @@ class HeadingCalculator {
     /**
      * Calculates the declination for the current Location.
      * Needed for converting the magnetic North to the true North.
+     *
      * @param currentLocation Location
      * @return float declination
      */
-    private static float calculateDeclination(Location currentLocation){
+    private static float calculateDeclination(Location currentLocation) {
         GeomagneticField geoField = new GeomagneticField(
                 Double.valueOf(currentLocation.getLatitude()).floatValue(),
                 Double.valueOf(currentLocation.getLongitude()).floatValue(),
@@ -57,6 +59,7 @@ class HeadingCalculator {
     /**
      * Helper method.
      * Converts degrees from the range [~-180, ~+180] to the range [0, 359]
+     *
      * @param value degree value
      * @return normalized 0 <= degree <= 359
      */

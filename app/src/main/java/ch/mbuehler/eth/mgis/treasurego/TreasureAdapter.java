@@ -16,7 +16,7 @@ import java.util.HashMap;
  * Adapter class to display Treasure objects.
  * Inspired by
  * https://www.journaldev.com/10416/android-listview-with-custom-adapter-example-tutorial
-  */
+ */
 public class TreasureAdapter extends ArrayAdapter<Treasure> {
     /**
      * List with Treasures that will be displayed
@@ -33,7 +33,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
     /**
      * View lookup cache
-      */
+     */
     private static class ViewHolder {
         TextView nameText;  // Name of the Treasure
         TextView achievedRewardText;  // Achieved Reward for a given Treasure
@@ -42,15 +42,14 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
     }
 
     /**
-     *
-     * @param data The treasures to be displayed
+     * @param data           The treasures to be displayed
      * @param treasureQuests HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
-     * @param context ApplicationContext
+     * @param context        ApplicationContext
      */
     TreasureAdapter(ArrayList<Treasure> data, HashMap<String, ArrayList<Quest>> treasureQuests, Context context) {
         super(context, R.layout.treasure_row, data);
         this.treasures = data;
-        this.mContext=context;
+        this.mContext = context;
         this.treasureQuests = treasureQuests;
     }
 
@@ -86,10 +85,10 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
         // Set the image
         // Choose Treasure picture depending on whether the Treasure has been found or not
-        if(treasureQuests.keySet().contains(treasure.getUuid())){
+        if (treasureQuests.keySet().contains(treasure.getUuid())) {
             // The user has already found the Treasure
             viewHolder.image.setImageResource(R.drawable.treasure_open);
-        } else{
+        } else {
             // The Treasure has yet to be found
             viewHolder.image.setImageResource(R.drawable.treasure_closed);
         }
@@ -97,9 +96,9 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
         return convertView;
     }
 
-    private String getAchievedRewardText(String treasureUuid){
+    private String getAchievedRewardText(String treasureUuid) {
         int achievedReward = 0;
-        if (treasureQuests.keySet().contains(treasureUuid)){
+        if (treasureQuests.keySet().contains(treasureUuid)) {
             achievedReward = GameStatus.Instance().getMaxReward(treasureQuests.get(treasureUuid));
         }
 

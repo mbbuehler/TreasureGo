@@ -35,7 +35,7 @@ public class GameStatus {
     private HashMap<String, ArrayList<Quest>> treasureQuests;
 
 
-    private GameStatus(){
+    private GameStatus() {
         allTreasures = new ArrayList<>();
         hasBeenInitialized = false;
         treasureQuests = new HashMap<>();
@@ -44,10 +44,11 @@ public class GameStatus {
     /**
      * Returns the unique instance of GameStatus
      * Synchronized is needed to make this method thread safe
+     *
      * @return
      */
-    static synchronized GameStatus Instance(){
-        if(instance == null){
+    static synchronized GameStatus Instance() {
+        if (instance == null) {
             instance = new GameStatus();
         }
         return instance;
@@ -55,9 +56,10 @@ public class GameStatus {
 
     /**
      * Resets all data for this GameStatus.
+     *
      * @param context ApplicationContext
      */
-    void reset(Context context){
+    void reset(Context context) {
         // Load all treasures from file
         ArrayList<Treasure> allTreasures = new TreasureLoader().loadTreasures(context);
         Instance().setAllTreasures(allTreasures);
@@ -76,6 +78,7 @@ public class GameStatus {
 
     /**
      * Returns all the uuids of the Treasures that have been found
+     *
      * @return
      */
     Set<String> getUuidTreasuresFound() {
@@ -87,15 +90,16 @@ public class GameStatus {
      * If treasureQuest has no entry for the associated Treasure, a new entry is created.
      * If treasureQuest already has an entry for the associated Treasure, the provided Quest
      * is appended.
+     *
      * @param quest
      */
-    void addQuest(Quest quest){
+    void addQuest(Quest quest) {
         String treasureKey = quest.getTreasure().getUuid();
-        if(treasureQuests.get(treasureKey) == null){
+        if (treasureQuests.get(treasureKey) == null) {
             ArrayList<Quest> questList = new ArrayList<>();
             questList.add(quest);
             treasureQuests.put(treasureKey, questList);
-        } else{
+        } else {
             treasureQuests.get(treasureKey).add(quest);
         }
     }
@@ -103,12 +107,13 @@ public class GameStatus {
     /**
      * Returns the last Quest for the given Treasure UUID. If no such Quest exists,
      * this method returns null.
+     *
      * @param uuid uuid of a Treasure
      * @return Quest or null
      */
-    public Quest getLastQuestForTreasureUuid(String uuid){
+    public Quest getLastQuestForTreasureUuid(String uuid) {
         Quest lastQuest;
-        if(treasureQuests.containsKey(uuid) && treasureQuests.get(uuid).size() > 0){
+        if (treasureQuests.containsKey(uuid) && treasureQuests.get(uuid).size() > 0) {
             // The associated ArrayList contains at least one entry.
             // We return the last entry.
             ArrayList<Quest> questList = treasureQuests.get(uuid);
@@ -123,6 +128,7 @@ public class GameStatus {
     boolean hasBeenInitialized() {
         return Instance().hasBeenInitialized;
     }
+
     void setHasBeenInitialized(boolean hasBeenInitialized) {
         Instance().hasBeenInitialized = hasBeenInitialized;
     }
@@ -130,14 +136,15 @@ public class GameStatus {
     /**
      * We can have several Quests for the same Treasure.
      * This method extracts the maximum reward achieved for a list of Quests.
+     *
      * @param quests Quest
      * @return int maximum reward found in quests
      */
-    public int getMaxReward(ArrayList<Quest> quests){
+    public int getMaxReward(ArrayList<Quest> quests) {
         int maxReward = 0;
         // Iterate through quests to find maximum reward
-        for(Quest quest: quests){
-            if (quest.getReward() > maxReward){
+        for (Quest quest : quests) {
+            if (quest.getReward() > maxReward) {
                 maxReward = quest.getReward();
             }
         }
@@ -148,13 +155,14 @@ public class GameStatus {
      * Returns the total reward achieved since last reset.
      * If a Treasure has been found several times, the maximum score
      * for this Treasure is considered.
+     *
      * @return int total reward
      */
-    int getTotalReward(){
+    int getTotalReward() {
         int totalReward = 0;
 
         // Iterate through the scores for all Treasures
-        for(String uuid: treasureQuests.keySet()){
+        for (String uuid : treasureQuests.keySet()) {
             ArrayList<Quest> quests = treasureQuests.get(uuid);
             // We can have several Quests for the same Treasure.
             // Extract the maximum reward achieved for this Treasure

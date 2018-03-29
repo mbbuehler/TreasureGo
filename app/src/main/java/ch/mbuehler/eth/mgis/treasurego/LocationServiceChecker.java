@@ -36,7 +36,7 @@ class LocationServiceChecker {
      * This means we have GPS and the airplane mode is off.
      *
      * @param locationManager LocationManager
-     * @param context Activity or Context
+     * @param context         Activity or Context
      * @return true if LocationServices are enabled
      */
     static boolean areLocationServicesEnabled(LocationManager locationManager, Context context) {

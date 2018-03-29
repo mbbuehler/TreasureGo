@@ -32,11 +32,11 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
 
         // Do not reset the Treasures if we have already initalized them. This happens when we come
         // back to this Activity after finding a Treasure
-        if(!GameStatus.Instance().hasBeenInitialized()){
+        if (!GameStatus.Instance().hasBeenInitialized()) {
             // The game has not been initialized. Initialize treasures now.
             resetTreasures();
             GameStatus.Instance().setHasBeenInitialized(true);
-        } else{
+        } else {
             // The game has already been initialized. Update the view such that we can see which
             // Treasures we have already found.
             updateTreasureListview();
@@ -45,29 +45,27 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
     }
 
     /**
-     *
      * @param view
      */
-    public void loadTreasures(View view){
+    public void loadTreasures(View view) {
         resetTreasures();
     }
 
     /**
      * Deletes all found and hidden treasures and reloads the provided treasures.
-     *
      */
-    public void resetTreasures(){
+    public void resetTreasures() {
         // Delete found Treasures
         GameStatus.Instance().reset(getApplicationContext());
         // Reload View
         updateTreasureListview();
-        if(GameStatus.Instance().hasBeenInitialized()){
+        if (GameStatus.Instance().hasBeenInitialized()) {
             // Don't display Toast if we are loading the Treasures for the first time
             Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateTreasureListview(){
+    private void updateTreasureListview() {
         // We use a custom Adapter such that we can display each Treasure with name, reward and an image
         TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getTreasureQuests(), getApplicationContext());
 
@@ -83,7 +81,7 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
         TextView scoreView = findViewById(R.id.scoreValue);
     }
 
-    private void updateCurrentScore(){
+    private void updateCurrentScore() {
         TextView scoreView = findViewById(R.id.scoreValue);
         String scoreText = String.format("%d coins", GameStatus.Instance().getTotalReward());
         scoreView.setText(scoreText);
@@ -92,9 +90,10 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
     /**
      * Returns an onItemClickListener. This listener specifies what should happen when the user has
      * selected a Treasure.
+     *
      * @return AdapterView.OnItemClickListener
      */
-    public AdapterView.OnItemClickListener getOnTreasureSelectedListener(){
+    public AdapterView.OnItemClickListener getOnTreasureSelectedListener() {
         AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             // This Listener is called when the user selects a Treasure from the list.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

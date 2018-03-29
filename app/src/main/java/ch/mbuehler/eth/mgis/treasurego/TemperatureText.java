@@ -14,6 +14,7 @@ public class TemperatureText {
 
     /**
      * Calling activity
+     *
      * @param context
      */
     public TemperatureText(Context context) {
@@ -23,7 +24,7 @@ public class TemperatureText {
     /**
      * @return true if the device has a temperature Sensor
      */
-    private boolean hasAmbientTemperatureSensor(){
+    private boolean hasAmbientTemperatureSensor() {
         // Get information from PackageManager
         PackageManager manager = context.getPackageManager();
         return manager.hasSystemFeature(PackageManager.FEATURE_SENSOR_AMBIENT_TEMPERATURE);
@@ -33,14 +34,15 @@ public class TemperatureText {
      * Defines and formats text for temperature Views
      * If there is no temperature Sensor available,
      * the returned string will contain this information.
+     *
      * @param temperature temperature in degrees Celsius
      * @return formatted text
      */
-    String getText(float temperature){
+    String getText(float temperature) {
         String text;
-        if(hasAmbientTemperatureSensor()){
+        if (hasAmbientTemperatureSensor()) {
             text = Formatter.formatDouble(temperature, 1) + context.getString(R.string.degreeC);
-        } else{
+        } else {
             text = context.getString(R.string.NAnoSensor);
         }
         return text;

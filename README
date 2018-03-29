@@ -1,0 +1,16 @@
+TreasureGo
+=========
+This repository contains the source code of TreasureGo Android version 1.0.0.
+
+TreasureGo is a game similar to PokémonGO. Instead of searching for Pokémons, we search for Treasures.
+
+Have fun!
+
+
+Please Note
+=========
+- The arrow pointing to the target Treasure is not reliable when you get close to the Treasure (within 20-50 meters). This is due to inaccuracies of the estimated Locations. If the arrow does not work well for further distance, you can calibrate your sensors.
+
+Android SDK Version
+=========
+Target SDK Version: 26
