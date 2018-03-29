@@ -62,7 +62,11 @@ public class MainActivity extends AppCompatActivity {//implements AdapterView.On
         GameStatus.Instance().reset(getApplicationContext());
         // Reload View
         updateTreasureListview();
-        Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
+        if(GameStatus.Instance().hasBeenInitialized()){
+            // Don't display Toast if we are loading the Treasures for the first time
+            Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void updateTreasureListview(){

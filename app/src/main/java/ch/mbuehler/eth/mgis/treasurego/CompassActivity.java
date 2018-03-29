@@ -35,6 +35,8 @@ import java.util.List;
  */
 public class CompassActivity extends AppCompatActivity implements LocationListener, SensorEventListener {
 
+    private PermissionChecker permissionChecker;
+
     /**
      * Managers for sensor data
      */
@@ -68,7 +70,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private static final int DIST_TARGET_REACHED = 20; // in meters TODO: adjust
 
-    private boolean hasUserDeniedPermissions = false;
 
     private long startTime = 0;
     private long lastMeasuredTime = 0;
@@ -78,7 +79,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     private final int ARROW_UPDATE_DELAY = 500 * 1000000;  // in nanoseconds. 500ms
 
 
-    public static final int REQUEST_CODE_ASK_PERMISSION = 1;
+
 
     public LocationTracker locationTracker;
 
@@ -138,7 +139,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         }
         boolean airplainModeIsOff = !this.isAirplaneModeOn(getApplicationContext());
         return airplainModeIsOff && gps_enabled;
-
     }
 
     /**
@@ -170,79 +170,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
 
 
-    /* ================== Permissions Section  ================== */
 
-    /**
-     * Checks the required permissions and requests them if needed.
-     * Required permissions:
-     * - Manifest.permission.ACCESS_FINE_LOCATION
-     * - Manifest.permission.ACCESS_COARSE_LOCATION
-     */
-    private void checkPermissions() {
-        // All required permissions
-        String[] permissions = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                // We don't need this because we store the CSV file with the app itself.
-                // Uncomment this file if you want to read the CSV file from external storage.
-//                Manifest.permission.READ_EXTERNAL_STORAGE
-        };
-
-        // Holds permissions that we need to ask permissions for.
-        final List<String> permissionsList = new ArrayList<>();
-        // Add permissions that we don't have yet
-        for(String permission: permissions){
-            addPermission(permissionsList, permission);
-        }
-
-        if (permissionsList.size() > 0) {
-            // We have permissions to ask for
-            ActivityCompat.requestPermissions(this, permissionsList.toArray(new String[permissionsList.size()]), REQUEST_CODE_ASK_PERMISSION);
-        }
-    }
-
-    /**
-     * Requests Location updates from the locationManager. If there are missing permissions,
-     * the user is asked to provide them.
-     */
-    private void enableLocationUpdates() {
-        if(hasUserDeniedPermissions){
-            // The user has already denied permissions. Go back to MainActivity.
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            // Inform the user why we went back.
-            Toast.makeText(this, R.string.pleasePermissions, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        // Check if we have the required permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BW_UPDATES, DIST_BW_UPDATES, this);
-        } else {
-            // Ask user for permission
-            checkPermissions();
-        }
-    }
-
-    /**
-     * Checks if permission has been granted. If not the permission code is added to permissionList
-     * https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
-     * @param permissionsList
-     * @param permission
-     * @return true if permission has been granted and false otherwise
-     */
-    private boolean addPermission(List<String> permissionsList, String permission) {
-        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-            // Permission has not been granted. Add it to the list.
-            permissionsList.add(permission);
-
-            if (!shouldShowRequestPermissionRationale(permission)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /* ================== Handling Sensor Updates Section  ================== */
 
@@ -468,6 +396,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
+        permissionChecker = new PermissionChecker(this);
+
         // Obtain target Treasure from Intent
         this.targetTreasure = this.unserializeTreasureFromIntent();
 
@@ -533,36 +463,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         startActivity(intent);
     }
 
-    /**
-     * This method is called after the user has responded to a permission request
-     *
-     * @param requestCode  requestCode from requestPermissions()
-     * @param permissions  not used
-     * @param grantResults tells us if the user has granted permissions or not
-     */
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Thank the user for granting permissions
-                    Toast.makeText(this, "Thank you and have fun!", Toast.LENGTH_SHORT).show();
-                    enableLocationUpdates();
-                    hasUserDeniedPermissions = false;
-//                    }
-                } else if(grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_DENIED){
-                    // We did not get the permission.
-                    // Memorize this such that we don't ask again right now.
-                    hasUserDeniedPermissions = true;
-                }
-                break;
-            }
-        }
-    }
+
 
     private void onTargetLocationReached() {
         // This check is necessary to prevent that
@@ -609,6 +510,63 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
                 break;
         }
     }
+    /**
+     * This method is called after the user has responded to a permission request
+     *
+     * @param requestCode  requestCode from requestPermissions()
+     * @param permissions  not used
+     * @param grantResults tells us if the user has granted permissions or not
+     */
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PermissionChecker.REQUEST_CODE_ASK_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Thank the user for granting permissions
+                    Toast.makeText(this, "Thank you and have fun!", Toast.LENGTH_SHORT).show();
+                    enableLocationUpdates();
+                    permissionChecker.setHasUserDeniedPermissions(false);
+//                    }
+                } else if(grantResults.length > 0 && grantResults[0] ==
+                        PackageManager.PERMISSION_DENIED){
+                    // We did not get the permission.
+                    // Memorize this such that we don't ask again right now.
+                    permissionChecker.setHasUserDeniedPermissions(true);
+                }
+                break;
+            }
+        }
+    }
 
+
+
+
+
+    /**
+     * Requests Location updates from the locationManager. If there are missing permissions,
+     * the user is asked to provide them.
+     */
+    private void enableLocationUpdates() {
+        if(permissionChecker.isHasUserDeniedPermissions()){
+            // The user has already denied permissions. Go back to MainActivity.
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            // Inform the user why we went back.
+            Toast.makeText(this, R.string.pleasePermissions, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Check if we have the required permissions
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BW_UPDATES, DIST_BW_UPDATES, this);
+        } else {
+            // Ask user for permission
+            permissionChecker.checkPermissions();
+        }
+    }
 
 }
