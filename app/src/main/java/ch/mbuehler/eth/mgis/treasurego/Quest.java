@@ -1,16 +1,34 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 /**
- * Created by marcello on 28/03/18.
+ * This class holds data about Quests.
+ * A Quest is a subgame, where the user searches for one Treasure.
  */
-
 public class Quest {
 
+    /**
+     * Target Treasure
+     */
     private Treasure treasure;
+    /**
+     * The average speed in m/s
+     */
     private double avgSpeed;
+    /**
+     * Temperature in degrees Celsius
+     */
     private float temperature;
+    /**
+     * Quest status, e.g. COMPLETED
+     */
     private QuestStatus status;
 
+    /**
+     * @param treasure Target Treasure
+     * @param avgSpeed average speed achieved in this Quest
+     * @param temperature degrees Celsius
+     * @param status COMPLETED
+     */
     public Quest(Treasure treasure, double avgSpeed, float temperature, QuestStatus status) {
         this.treasure = treasure;
         this.avgSpeed = avgSpeed;
@@ -50,6 +68,10 @@ public class Quest {
         this.status = status;
     }
 
+    /**
+     * Calculates the reward achieved for this Quest
+     * @return int number of coins received
+     */
     public int getReward(){
         return RewardCalculator.calculateReward(getTreasure(), getAvgSpeed(), getTemperature());
     }

@@ -56,7 +56,7 @@ public class Treasure implements Serializable{
         this.uuid = data[4];
     }
 
-    public String getUuid() {
+    String getUuid() {
         return uuid;
     }
 
@@ -85,7 +85,7 @@ public class Treasure implements Serializable{
         }
     }
 
-    public Location getLocation() {
+    Location getLocation() {
         return location;
     }
 
@@ -119,7 +119,7 @@ public class Treasure implements Serializable{
      * @param intent with StringExtra
      * @return Treasure
      */
-    public static Treasure unserializeTreasureFromIntent(Intent intent) {
+    static Treasure unserializeTreasureFromIntent(Intent intent) {
         String treasureSerialized = intent.getStringExtra(MainActivity.TREASURE_KEY);
         return new Treasure(treasureSerialized);
     }

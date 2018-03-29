@@ -1,10 +1,9 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 /**
- * Created by marcello on 28/03/18.
+ * Formats numbers to Strings
  */
-
-public class Formatter {
+class Formatter {
 
     /**
      * Formats Double for given precision
@@ -12,7 +11,7 @@ public class Formatter {
      * @param precision digits after the comma, e.g. 3 for 0.123
      * @return String
      */
-    public static String formatDouble(double d, int precision) {
+    static String formatDouble(double d, int precision) {
         return String.format("%1$,." + precision + "f", d);
     }
 }

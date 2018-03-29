@@ -2,7 +2,6 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 import android.hardware.GeomagneticField;
 import android.location.Location;
-import android.util.Log;
 
 /**
  * Responsible for calculating the (degree) directions from one Location to another.

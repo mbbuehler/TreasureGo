@@ -2,7 +2,6 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 import android.location.Location;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -29,6 +28,9 @@ class LocationTracker {
     /**
      * Number of samples used to calculate the smoothed distance to a point. This helps avoiding
      * "jump" due to noisy measurements.
+     * Setting this variable to 1 calculates a non-smoothed distance
+     * (i.e. calculates the distance to the last known Location).
+     * This is a Beta feature and has not been tested thoroughly.
      */
     private final int N_SMOOTHING_LOCATIONS = 1;
 

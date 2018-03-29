@@ -1,12 +1,10 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,27 +12,42 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * This activity helps the user find Treasures.
+ * This activity guides the user to find Treasures.
+ *
+ * There are a lot of things happening in this Activity.
+ * In order to make this class as lightweight as possible,
+ * most business logic has been extracted into other classes.
+ * However, this class still has to manage the interplay between a number of components.
+ *
+ * In order to make navigation within this class as easy as possible,
+ * it has been structured into the following sections:
+ *
+ * 1. Sensor Updates Section
+ *    Sensor updates need to be processed.
+ *    This section deals with the business logic for Sensor updates.
+ *
+ * 2. Getters and Setters Section:
+ *    Getters and Setters for this class.
+ *
+ * 3. Event Section:
+ *    This section has methods that deal with events, e.g. onCreate() or onResume().
+ *
+ * 4. LocationUpdates Section:
+ *    This section deals with Location updates.
  */
 public class CompassActivity extends AppCompatActivity implements LocationListener, SensorEventListener {
 
+    /**
+     * Object that manages permission checks and requests
+     */
     private PermissionChecker permissionChecker;
 
     /**
@@ -47,20 +60,19 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * Current Location of the user.
      */
     private Location currentLocation;
-    /**
-     * Location of the target Treasure. This is where the user should be heading to.
-     */
-    private Location targetLocation;
+
     /**
      * The treasure we want to find
      */
     private Treasure targetTreasure;
 
+    /**
+     * Responsible for updating the View elements, e.g. distance, time, etc.
+     */
     ViewUpdater viewUpdater;
 
-
     /**
-     * Time between location updates
+     * Max time between location updates
      */
     private static final long TIME_BW_UPDATES = 1000; // in milliseconds
     /**
@@ -68,99 +80,53 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      */
     private static final long DIST_BW_UPDATES = 5; // in meters
     /**
-     * When the user gets closer to the target Treasure than this value, we consider the Treasure as "found"
+     * When the user gets closer to the target Treasure than this value,
+     * we consider the Treasure as "found"
      */
-    private static final int DIST_TARGET_REACHED = 20; // in meters TODO: adjust
+    private static final int DIST_TARGET_REACHED = 20; // in meters
 
-    private long lastMeasuredTime = 0;
+    /**
+     * Once the target Treasure has been reached, we want to stop updating View
+     * and halt calculations. This variable is set to true when the user first
+     * finds a Treasure.
+     */
     private boolean targetReached = false; // ignore Location updates after reaching target
 
-    private final int SENSOR_DELAY = 500; // 500ms
-
-
-
-
+    /**
+     * locationTracker keeps track of Location measurements. This allows for
+     * more efficient computations of averageSpeed and distances.
+     */
     public LocationTracker locationTracker;
 
+    /**
+     * Sensor values for orientation. Collected by RotationVector.
+     * Elements of array:
+     * - Azimuth (degrees of rotation about z-axis)
+     * - Pitch (degrees of rotation about the x-axis)
+     * - Roll (degrees of rotation about the y axis)
+     * Check this link for further info:
+     * https://developer.android.com/guide/topics/sensors/sensors_motion.html#sensors-motion-rotate
+     */
     private float[] orientation = new float[3];
     private final float[] mRotationMatrix = new float[9];
-    /**
-     * Azimuth (degrees of rotation about z-axis), Pitch (degrees of rotation about the x-axis), Roll (degrees of rotation about the y axis)
-     */
 
+    /**
+     * Current temperature in degrees Celsius
+     */
     private float currentTemperature;
 
-    Handler timerHandler = new Handler();
-    Runnable timerRunnable = new Runnable() {
-        // https://stackoverflow.com/questions/4597690/android-timer-how-to
-        @Override
-        public void run() {
-            viewUpdater.updateAverageSpeed();
-            viewUpdater.updateCurrentSpeed();
-            viewUpdater.updateCurrentReward();
-            viewUpdater.updateTime();
-
-            if (System.nanoTime() - lastMeasuredTime > 1000000000) {
-                viewUpdater.updateArrow();
-                lastMeasuredTime = System.nanoTime();
-            }
-            timerHandler.postDelayed(this, SENSOR_DELAY);
-        }
-    };
-
-
-    /* ================== Helper Methods Section  ================== */
-
     /**
-     * Gets the state of Airplane Mode.
-     *
-     * @param context
-     * @return true if enabled.
+     * timeHandler posts the timerRunnable regularly and makes sure
+     * that we keep updating the View.
      */
-    @SuppressWarnings("deprecation")
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private boolean isAirplaneModeOn(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.AIRPLANE_MODE_ON, 0) != 0;
-        } else {
-            return Settings.Global.getInt(context.getContentResolver(),
-                    Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-        }
-    }
-
-    private boolean areLocationServicesEnabled() {
-        boolean gps_enabled = false;
-        try {
-            gps_enabled = this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        boolean airplainModeIsOff = !this.isAirplaneModeOn(getApplicationContext());
-        return airplainModeIsOff && gps_enabled;
-    }
-
-    /**
-     * Azimuth (degrees of rotation about the -z axis). This is the angle between the device's current compass direction and magnetic north. If the top edge of the device faces magnetic north, the azimuth is 0 degrees; if the top edge faces south, the azimuth is 180 degrees. Similarly, if the top edge faces east, the azimuth is 90 degrees, and if the top edge faces west, the azimuth is 270 degrees.
-     *
-     * @return
-     */
-
-
-
-
-
-
-
-
-
+    private Handler timerHandler = new Handler();
 
 
     /* ================== Handling Sensor Updates Section  ================== */
 
     /**
      * Extracts the measured temperature from the sensor values and updates the View.
-     * @param sensorValues
+     * @param sensorValues values from the Temperature Sensor
      */
     private void handleTemperatureUpdate(float[] sensorValues) {
         this.currentTemperature = sensorValues[0];
@@ -172,7 +138,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * See
      * https://developer.android.com/guide/topics/sensors/sensors_position.html
      * for more information
-     * @param sensorValues
+     *
+     * @param sensorValues values from the sensor fusion for orientation.
      */
     private void handleRotationUpdate(float[] sensorValues) {
         SensorManager.getRotationMatrixFromVector(mRotationMatrix, sensorValues);
@@ -187,8 +154,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
         String distanceText = "n.a.";
 
-        //
-        double distance = this.locationTracker.calculateSmoothedDistanceTo(this.targetLocation);
+        // Calculate the distance to the target
+        double distance = this.locationTracker.calculateSmoothedDistanceTo(getTargetLocation());
         if (distance < DIST_TARGET_REACHED) {
             // We have reached the target location
             onTargetLocationReached();
@@ -199,19 +166,23 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             // Display the distance in m
             distanceText = Formatter.formatDouble(distance, 1) + " m";
         }
+        // Update View
         viewUpdater.updateDistance(distanceText);
     }
-
 
 
     /* ================== Getters and Setters Section  ================== */
 
     public Location getTargetLocation() {
-        return targetLocation;
+        return this.targetTreasure.getLocation();
     }
 
+    /**
+     * @return Current Location
+     * @throws LocationNotFoundException if not Location is available
+     */
     public Location getCurrentLocation() throws LocationNotFoundException {
-        if (this.areLocationServicesEnabled()) {
+        if (LocationServiceChecker.areLocationServicesEnabled(locationManager, this)) {
             viewUpdater.updateLocationNotFoundVisibility(View.GONE);
             if (this.currentLocation != null) {
                 return this.currentLocation;
@@ -222,6 +193,9 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         throw new LocationNotFoundException("Location was not found.");
     }
 
+    /**
+     * @return Average speed since start of Quest
+     */
     double getAverageSpeed() {
         return this.locationTracker.getAverageSpeed();
     }
@@ -239,11 +213,18 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         return this.targetTreasure;
     }
 
+    /**
+     * Calculates the heading between current device orientation and target Location
+     *
+     * @return float 0 <= angle <= 359 to target Location
+     * @throws LocationNotFoundException if not Location was available
+     */
     float getHeading() throws LocationNotFoundException {
         Location currentLocation = getCurrentLocation();
         Location targetLocation = getTargetLocation();
         return HeadingCalculator.calculateHeading(orientation, currentLocation, targetLocation);
     }
+
 
     /* ================== Event Section ================== */
 
@@ -252,25 +233,26 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
+        // Instantiate instance for permission checks and view updates
         permissionChecker = new PermissionChecker(this);
         viewUpdater = new ViewUpdater(this);
+        locationTracker = new LocationTracker();
 
         // Obtain target Treasure from Intent
-        this.targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
+        targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
 
-        this.targetLocation = this.targetTreasure.getLocation();
+        // Instantiate mangers for location and sensors
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
 
-        this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        timerHandler.postDelayed(timerRunnable, 0);
-
-        this.locationTracker = new LocationTracker();
-
-        // maybe add try / catch clause
-
-        this.sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
-
+        // Update the field that names the target Treasure
+        // We only need to do that once so we do it here.
         viewUpdater.updateSearchingFor();
+
+        // Create the runnable responsible for regular updates
+        CompassActivityRunnable runnable = new CompassActivityRunnable(timerHandler, viewUpdater);
+        // Start the game
+        timerHandler.postDelayed(runnable, 0);
     }
 
     @Override
@@ -294,78 +276,84 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     @Override
     public void onLocationChanged(Location currentLocation) {
+        // Set instance variable such that other methods can access it
         this.currentLocation = currentLocation;
+        // Keep track of all Locations measured
         this.locationTracker.addSample(currentLocation);
+        // Update View and check if we have reached the target Location
         handleDistanceToTargetUpdate();
     }
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
     }
 
     @Override
     public void onProviderEnabled(String s) {
-
     }
 
     @Override
     public void onProviderDisabled(String s) {
-
     }
 
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+    }
+
+    /**
+     * User has clicked the back button.
+     * Will redirect the user to MainActivity.
+     * @param view
+     */
     public void onAbort(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
-
-
+    /**
+     * Handles what has to happen when the user has reached the target Location.
+     * Will redirect the user to TreasureFoundActivity.
+     */
     private void onTargetLocationReached() {
         // This check is necessary to prevent that
         // this method is called several times for the same Quest
-        if(!this.targetReached){
+        if (!this.targetReached) {
+            // Prevents the code bellow to be called more than once
             this.targetReached = true;
 
+            // Save Quest such that we can access it later
             Quest completedQuest = new Quest(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature(), QuestStatus.COMPLETED);
             GameStatus.Instance().addQuest(completedQuest);
 
+            // Go to next Activity
             Intent intent = new Intent(this, TreasureFoundActivity.class);
             intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
             startActivity(intent);
         }
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
-    }
-
+    /**
+     * Listener for Sensor updates.
+     * Handles each Sensor separately.
+     * @param sensorEvent can be from any sensor
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
-//            case Sensor.TYPE_ACCELEROMETER:
-//                System.arraycopy(sensorEvent.values, 0, this.mAccelerometerReading, 0, this.mAccelerometerReading.length);
-//                updateDirection = true;
-//                break;
             case Sensor.TYPE_ROTATION_VECTOR:
+                // Update device orientation
                 handleRotationUpdate(sensorEvent.values);
                 break;
-//            case Sensor.TYPE_GAME_ROTATION_VECTOR:
-//                SensorManager.getRotationMatrixFromVector(mRotationMatrix, sensorEvent.values);
-//                updateDirection = true;
-//                break;
-//            case Sensor.TYPE_MAGNETIC_FIELD:
-//                System.arraycopy(sensorEvent.values, 0, this.mMagnetometerReading, 0, this.mMagnetometerReading.length);
-//                updateDirection = true;
-//                break;
             case Sensor.TYPE_AMBIENT_TEMPERATURE:
+                // Update temperature related fields
                 this.handleTemperatureUpdate(sensorEvent.values);
                 break;
             default:
                 break;
         }
     }
+
     /**
      * This method is called after the user has responded to a permission request
      *
@@ -376,19 +364,20 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     @Override
     public void onRequestPermissionsResult(
             int requestCode, String permissions[], int[] grantResults) {
+        // permissionChecker handles this.
+        // See method documentation of handleRequestPermissionsResult(...) for more information.
         permissionChecker.handleRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
 
-
-
+    /* ================== LocationUpdates Section ================== */
 
     /**
      * Requests Location updates from the locationManager. If there are missing permissions,
      * the user is asked to provide them.
      */
     void enableLocationUpdates() {
-        if(permissionChecker.isHasUserDeniedPermissions()){
+        if (permissionChecker.isHasUserDeniedPermissions()) {
             // The user has already denied permissions. Go back to MainActivity.
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
