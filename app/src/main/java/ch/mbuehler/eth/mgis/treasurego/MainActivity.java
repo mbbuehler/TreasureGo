@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     private void updateCurrentScore() {
         TextView scoreView = findViewById(R.id.scoreValue);
-        String scoreText = String.format("%d coins", GameStatus.Instance().getTotalReward());
+        String scoreText = String.format("%d %s", GameStatus.Instance().getTotalReward(), getString(R.string.coins));
         scoreView.setText(scoreText);
     }
 
