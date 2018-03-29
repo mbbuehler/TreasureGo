@@ -46,16 +46,15 @@ class CompassViewUpdater {
      */
     void updateArrow() {
         try {
-            ImageView arrowView = activity.findViewById(R.id.arrow);
+            final ImageView arrowView = activity.findViewById(R.id.arrow);
 
             // Multiply by (-1) in order to make the arrow face the correct way.
-            float direction = -1 * activity.getHeading();
+            final float direction = -1 * activity.getHeading();
             arrowView.setRotation(direction);
         } catch (LocationNotFoundException e) {
             // Show message to user
             updateLocationNotFoundVisibility(View.VISIBLE);
         }
-
     }
 
     /**

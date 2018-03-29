@@ -23,6 +23,12 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
     public static final String TREASURE_KEY = "Treasure";
 
     /**
+     * Indicate when the user has selected a Treasure. This prevents that
+     * more than one CompassActivity is created.
+     */
+    private boolean userHasTreasureSelected = false;
+
+    /**
      * Required permissions for this class
      */
     String[] permissions = new String[]{
@@ -168,16 +174,22 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
             // This Listener is called when the user selects a Treasure from the list.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // We want to go to the CompassActivity
-                Intent intent = new Intent(MainActivity.this, CompassActivity.class);
+                // If we do not check here, we might end up
+                // creating several CompassActivity instances
+                if (!userHasTreasureSelected) {
+                    userHasTreasureSelected = true;
 
-                // Fetch the target Treasure from the list.
-                Treasure selectedTreasure = (Treasure) parent.getAdapter().getItem(position);
-                // Serialize and send the target Treasure with the Intent.
-                String serializedTreasure = selectedTreasure.serialize();
-                intent.putExtra(TREASURE_KEY, serializedTreasure);
-                // Starting the CompassActivity.
-                startActivity(intent);
+                    // We want to go to the CompassActivity
+                    Intent intent = new Intent(MainActivity.this, CompassActivity.class);
+
+                    // Fetch the target Treasure from the list.
+                    Treasure selectedTreasure = (Treasure) parent.getAdapter().getItem(position);
+                    // Serialize and send the target Treasure with the Intent.
+                    String serializedTreasure = selectedTreasure.serialize();
+                    intent.putExtra(TREASURE_KEY, serializedTreasure);
+                    // Starting the CompassActivity.
+                    startActivity(intent);
+                }
             }
         };
         return listener;

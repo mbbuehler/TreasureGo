@@ -56,6 +56,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(targetLatLng).title(targetTreasure.getName()));
 
         // Move the camera to the target Location and zoom in
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLatLng, 16.0f ));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLatLng, 16.0f));
     }
 }

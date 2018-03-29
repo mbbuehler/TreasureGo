@@ -311,7 +311,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         startActivity(intent);
     }
 
-    public void onMapButtonClicked(View view){
+    public void onMapButtonClicked(View view) {
         view.setEnabled(false);
 
         Intent intent = new Intent(this, MapsActivity.class);
