@@ -46,11 +46,6 @@ import android.widget.Toast;
 public class CompassActivity extends AppCompatActivity implements LocationListener, SensorEventListener {
 
     /**
-     * Object that manages permission checks and requests
-     */
-    private PermissionChecker permissionChecker;
-
-    /**
      * Managers for sensor data
      */
     private LocationManager locationManager;
@@ -234,8 +229,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        // Instantiate instance for permission checks and view updates
-        permissionChecker = new PermissionChecker(this);
+        // Instantiate instances for view updates and locationTracking
         viewUpdater = new CompassViewUpdater(this);
         locationTracker = new LocationTracker();
 
@@ -361,21 +355,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         }
     }
 
-    /**
-     * This method is called after the user has responded to a permission request
-     *
-     * @param requestCode  requestCode from requestPermissions()
-     * @param permissions  not used
-     * @param grantResults tells us if the user has granted permissions or not
-     */
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, String permissions[], int[] grantResults) {
-        // permissionChecker handles this.
-        // See method documentation of handleRequestPermissionsResult(...) for more information.
-        permissionChecker.handleRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
 
     /* ================== LocationUpdates Section ================== */
 
@@ -384,22 +363,10 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * the user is asked to provide them.
      */
     void enableLocationUpdates() {
-        if (permissionChecker.isHasUserDeniedPermissions()) {
-            // The user has already denied permissions. Go back to MainActivity.
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            // Inform the user why we went back.
-            Toast.makeText(this, R.string.pleasePermissions, Toast.LENGTH_LONG).show();
-            return;
-        }
-
         // Check if we have the required permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, TIME_BW_UPDATES, DIST_BW_UPDATES, this);
-        } else {
-            // Ask user for permission
-            permissionChecker.checkPermissions();
         }
     }
 

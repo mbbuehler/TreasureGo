@@ -1,6 +1,5 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -17,9 +16,10 @@ import java.util.List;
 class PermissionChecker {
 
     /**
-     * Make sure not to ask several times for permissions
+     * Make sure not to ask several times (max 2 times) for permissions
      */
     private boolean hasUserDeniedPermissions = false;
+    private boolean hasUserDeniedPermissionsTwice = false;
 
     /**
      * Identifier used when requesting permissions. Can be any number.
@@ -32,15 +32,9 @@ class PermissionChecker {
     private Context context;
 
     /**
-     * All required permissions
+     *  Holds permissions that we need to ask permissions for.
      */
-    private static String[] permissions = new String[]{
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            // We don't need this because we store the CSV file with the app itself.
-            // Uncomment this file if you want to read the CSV file from external storage.
-//                Manifest.permission.READ_EXTERNAL_STORAGE
-    };
+    private List<String> permissionsList = new ArrayList<>();
 
     /**
      * @param context Activity. Make sure to pass the Activity as "this" (not getApplicationContext())
@@ -51,16 +45,14 @@ class PermissionChecker {
 
     /**
      * Checks the required permissions and requests them if needed.
-     * Required permissions:
-     * - Manifest.permission.ACCESS_FINE_LOCATION
-     * - Manifest.permission.ACCESS_COARSE_LOCATION
+     * @param permissions String[] with Manifest.permission.*
+     *                    e.g. [Manifest.permission.ACCESS_FINE_LOCATION]
      */
-    void checkPermissions() {
-        // Holds permissions that we need to ask permissions for.
-        final List<String> permissionsList = new ArrayList<>();
+    void checkPermissions(String[] permissions) {
+//        permissionsList = new ArrayList<>();
         // Add permissions that we don't have yet
         for (String permission : permissions) {
-            addPermission(permissionsList, permission);
+            addPermission(permission);
         }
 
         if (permissionsList.size() > 0) {
@@ -69,16 +61,14 @@ class PermissionChecker {
         }
     }
 
-
     /**
      * Checks if permission has been granted. If not the permission code is added to permissionList
      * https://inthecheesefactory.com/blog/things-you-need-to-know-about-android-m-permission-developer-edition/en
      *
-     * @param permissionsList final List where we add permissions that have not been granted
      * @param permission      Manifest.permission.*
      * @return true if permission has been granted and false otherwise
      */
-    private boolean addPermission(List<String> permissionsList, String permission) {
+    private boolean addPermission(String permission) {
         if (context.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             // Permission has not been granted. Add it to the list.
             permissionsList.add(permission);
@@ -89,7 +79,7 @@ class PermissionChecker {
     /**
      * @return true if the user has already denied one permission
      */
-    boolean isHasUserDeniedPermissions() {
+    boolean hasUserDeniedPermissions() {
         return hasUserDeniedPermissions;
     }
 
@@ -101,16 +91,31 @@ class PermissionChecker {
     }
 
     /**
+     * @return true if the user has already denied permissions twice
+     */
+    boolean hasUserDeniedPermissionsTwice() {
+        return hasUserDeniedPermissionsTwice;
+    }
+
+    /**
+     * @param hasUserDeniedPermissionsTwice boolean
+     */
+    void setHasUserDeniedPermissionsTwice(boolean hasUserDeniedPermissionsTwice) {
+        this.hasUserDeniedPermissionsTwice = hasUserDeniedPermissionsTwice;
+    }
+
+    /**
      * This method is called from CompassActivity
      * after the user has responded to a permission request
      *
      * @param requestCode  requestCode from requestPermissions()
      * @param permissions  not used
      * @param grantResults tells us if the user has granted permissions or not
-     * @param activity     reference to CompassActivity
+     * @param actionable reference to PermissionActionable specifying
+     *                   what to to in case permissions have been granted / denied
      */
     void handleRequestPermissionsResult(
-            int requestCode, String permissions[], int[] grantResults, CompassActivity activity) {
+            int requestCode, String permissions[], int[] grantResults, PermissionActionable actionable) {
 
         switch (requestCode) {
             case PermissionChecker.REQUEST_CODE_ASK_PERMISSION: {
@@ -119,13 +124,22 @@ class PermissionChecker {
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Thank the user for granting permissions
                     Toast.makeText(context, R.string.thanksHaveFun, Toast.LENGTH_SHORT).show();
-                    activity.enableLocationUpdates();
+                    actionable.onPermissionGranted();
                     setHasUserDeniedPermissions(false);
+                    setHasUserDeniedPermissionsTwice(false);
                 } else if (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_DENIED) {
                     // We did not get the permission.
                     // Memorize this such that we don't ask again right now.
-                    setHasUserDeniedPermissions(true);
+                    if(!hasUserDeniedPermissions()){
+                        // It was the first time we asked
+                        setHasUserDeniedPermissions(true);
+                        actionable.onPermissionDenied();
+                    }else if(hasUserDeniedPermissions() && !hasUserDeniedPermissionsTwice()){
+                        // The user has denied permissions once. Ask once more
+                        setHasUserDeniedPermissionsTwice(true);
+                        actionable.onPermissionDeniedTwice();
+                    }
                 }
                 break;
             }

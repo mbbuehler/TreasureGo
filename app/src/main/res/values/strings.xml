@@ -25,6 +25,8 @@
     <string name="score">Score</string>
     <string name="currentScore">Current score</string>
     <string name="pleasePermissions">Please allow TreasureGo all the required permissions. Thank you.</string>
+    <string name="onPermissionsDeniedOnce">Are you sure? If you want to use TreasureGo, please grant all permissions. We now ask you again.</string>
+    <string name="onPermissionsDeniedTwice">We are sorry, but TreasureGo cannot run without permissions. Goodbye!</string>
     <string name="welcome">Welcome to TreasureGo!</string>
     <string name="chooseTreasure">Please choose a treasure</string>
     <string name="placeholder">Placeholder</string>
@@ -32,7 +34,7 @@
     <string name="done">done!</string>
     <string name="thanksHaveFun">"Thank you and have fun!"</string>
     <string name="thanksBye">Thank you for playing TreasureGo. Goodbye!</string>
-    <string name="NAnoSensor">- (no sensor)</string>
+    <string name="NAnoSensor">(no sensor)</string>
     <string name="degreeC">"\u2103"</string>
     <string name="speedUnit">m/s</string>
     <string name="meters">m</string>
