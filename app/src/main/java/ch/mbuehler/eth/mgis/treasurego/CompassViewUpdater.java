@@ -50,20 +50,9 @@ class CompassViewUpdater {
 
             // Multiply by (-1) in order to make the arrow face the correct way.
             float direction = -1 * activity.getHeading();
-
-//                Log.v("loc", String.format("old Rot: %f / dir: %f", oldRotation, direction));
-//                RotateAnimation rotate = new RotateAnimation(arrowRotation, direction, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, .5f );
-//
-//                arrowRotation = direction;
-////                        new RotateAnimation(oldRotation, 90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                rotate.setDuration(ARROW_UPDATE_DELAY * 2 / 1000000); //Math.round(Math.abs(arrowRotation - direction)/360*500));
-//                rotate.setInterpolator(new LinearInterpolator());
-//                arrowView.startAnimation(rotate);
-//
             arrowView.setRotation(direction);
-
-
         } catch (LocationNotFoundException e) {
+            // Show message to user
             updateLocationNotFoundVisibility(View.VISIBLE);
         }
 
