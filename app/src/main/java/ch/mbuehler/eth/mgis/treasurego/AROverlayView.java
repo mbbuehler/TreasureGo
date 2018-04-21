@@ -7,7 +7,10 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,9 +116,49 @@ public class AROverlayView extends View {
                 float x  = (0.5f + cameraCoordinateVector[0]/cameraCoordinateVector[3]) * canvas.getWidth();
                 float y = (0.5f - cameraCoordinateVector[1]/cameraCoordinateVector[3]) * canvas.getHeight();
 
+                arPoints.get(i).x = x;
+                arPoints.get(i).y = y;
+
                 canvas.drawCircle(x, y, radius, paint);
                 canvas.drawText(arPoints.get(i).getName(), x - (30 * arPoints.get(i).getName().length() / 2), y - 80, paint);
             }
         }
+    }
+
+    public OnTouchListener getOnTouchListener(){
+        return new OnTouchListener(){
+
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                double DIST_THRESHOLD = 60;
+
+                double x = motionEvent.getX();
+                double y = motionEvent.getY();
+                Log.v("TOUCH", String.format("%f, %f", x, y));
+
+                double closestDistance = 99999999;
+                ARPoint closestPoint = null;
+                for(int i = 0; i < arPoints.size(); ++i) {
+                    ARPoint point = arPoints.get(i);
+                    double distance = point.euclideanDistanceTo(x, y);
+                    if(closestPoint == null || distance < closestDistance){
+                        closestPoint = point;
+                        closestDistance = distance;
+                    }
+                }
+
+
+                if(closestDistance < DIST_THRESHOLD)
+                {
+                    Toast.makeText(context, "touched Point "+closestPoint.getName(), Toast.LENGTH_SHORT).show();
+                } else{
+                    Toast.makeText(context, "only touched", Toast.LENGTH_SHORT).show();
+
+                }
+
+
+                    return false;
+            }
+        };
     }
 }

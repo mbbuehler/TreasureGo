@@ -30,7 +30,7 @@ public class LocationSampler {
         double longitudeMin;
         double longitudeMax;
 
-        public Location sampleLocation(){
+        public Location sampleLocation(double altitude){
             double latitudeDifference = (latitudeMax - latitudeMin);
             double longitudeDifference = (longitudeMax - longitudeMin);
 
@@ -40,13 +40,10 @@ public class LocationSampler {
             Location sampledLocation = new Location("LocationSampler");
             sampledLocation.setLatitude(sampleLatitude);
             sampledLocation.setLongitude(sampleLongitude);
+            sampledLocation.setAltitude(altitude);
 
             return sampledLocation;
         }
-    }
-
-    private static double calculateDistanceBetweenLongitude(double latitude){
-        return 3960 * 2 * Math.PI / 360 * Math.cos(latitude);
     }
 
     private BoundingBox calculateBoundingBox(Location center, double distanceMax){
@@ -92,9 +89,9 @@ public class LocationSampler {
     }
 
     private Location sampleLocation(Location center, BoundingBox boundingBox, double distanceMin, double distanceMax){
-        Location sampledLocation = boundingBox.sampleLocation();
+        Location sampledLocation = boundingBox.sampleLocation(center.getAltitude());
         while(!isValidLocation(sampledLocation, center, distanceMin, distanceMax)){
-            sampledLocation = boundingBox.sampleLocation();
+            sampledLocation = boundingBox.sampleLocation(center.getAltitude());
         }
         return sampledLocation;
     }

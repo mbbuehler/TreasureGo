@@ -11,6 +11,8 @@ import android.location.Location;
 public class ARPoint {
     Location location;
     String name;
+    double x;
+    double y;
 
     /**
      * An ARPoint represent a point in the 3D space for the AROverlayView.
@@ -41,5 +43,13 @@ public class ARPoint {
      */
     public String getName() {
         return name;
+    }
+
+    public double euclideanDistanceTo(double x, double y){
+        return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
+    }
+
+    public String toString(){
+        return String.format("ARPoint(%f,%f)",x,y);
     }
 }

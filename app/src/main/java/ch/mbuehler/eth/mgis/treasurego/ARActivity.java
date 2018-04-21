@@ -73,8 +73,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         // only for debugging
         Location location = new Location("ARPoint");
-        location.setLatitude(47.2367027);
-        location.setLongitude(8.2800112);
+        location.setLatitude(47.4016738);
+        location.setLongitude(8.54294661);
+        location.setAltitude(65.0d);
 
 
         LocationSampler locationSampler = new LocationSampler();
@@ -89,6 +90,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         Log.v("Coords", sj.toString());
 
         arView = new AROverlayView(this,arPoints);
+        arView.setOnTouchListener(arView.getOnTouchListener());
 
     }
 
