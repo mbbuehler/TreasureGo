@@ -30,6 +30,7 @@ public class AROverlayView extends View {
     private Location currentLocation;
     private Set<ARGem> arGems;
     private Toast toast;
+    private ARViewUpdater viewUpdater;
 
     /**
      * Constructor of the AROverlyView class. Takes the contex and List of ARPoints as arguments.
@@ -37,13 +38,17 @@ public class AROverlayView extends View {
      * @param context the context creating the class
      * @param arGems  the List of ARPoints to be drawn
      */
-    public AROverlayView(Context context, Set<ARGem> arGems) {
+    public AROverlayView(Context context, Set<ARGem> arGems, ARViewUpdater viewUpdater) {
         super(context);
 
         this.context = context;
         this.arGems = arGems;
+        this.viewUpdater = viewUpdater;
 
         toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
+
+        // Initialize view
+        viewUpdater.updateARGemsNotFound(arGems.size());
     }
 
     /**
@@ -133,44 +138,63 @@ public class AROverlayView extends View {
     public OnTouchListener getOnTouchListener(final String targetTreasureUUID) {
         return new OnTouchListener() {
 
+            private long lastTouch = 0;
+            private final long DELAY_BETWEEN_TOUCHES = 200;  // ms
+
+            private void onAllGemsCollected(){
+                //            // Go to next Activity
+                Quest quest = GameStatus.Instance().getLastQuestForTreasureUuid(targetTreasureUUID);
+                quest.setGemCollectionTimeMillis(viewUpdater.getDeltaTimeMillis(viewUpdater.getStartTime()));
+
+                Intent intent = new Intent(context, TreasureFoundActivity.class);
+                intent.putExtra(MainActivity.TREASURE_KEY, targetTreasureUUID);
+                context.startActivity(intent);
+
+            }
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                double DIST_THRESHOLD = 60;
+                long currentTime = System.currentTimeMillis();
+                if(currentTime - lastTouch > DELAY_BETWEEN_TOUCHES) {
+                    lastTouch = currentTime;
 
-                double x = motionEvent.getX();
-                double y = motionEvent.getY();
-                Log.v("TOUCH", String.format("%f, %f", x, y));
+                    double DIST_THRESHOLD = 60;
 
-                double closestDistance = 99999999;
-                ARGem closestPoint = null;
-                for (ARGem arGem : arGems) {
-                    double distance = arGem.euclideanDistanceTo(x, y);
-                    if (closestPoint == null || distance < closestDistance) {
-                        closestPoint = arGem;
-                        closestDistance = distance;
+                    double x = motionEvent.getX();
+                    double y = motionEvent.getY();
+                    Log.v("TOUCH", String.format("%f, %f", x, y));
+
+                    double closestDistance = 99999999;
+                    ARGem closestPoint = null;
+                    for (ARGem arGem : arGems) {
+                        double distance = arGem.euclideanDistanceTo(x, y);
+                        if (closestPoint == null || distance < closestDistance) {
+                            closestPoint = arGem;
+                            closestDistance = distance;
+                        }
                     }
-                }
 
-                if (closestDistance < DIST_THRESHOLD) {
-                    arGems.remove(closestPoint);
-                    String info = closestPoint.getName() + " " + context.getString(R.string.collected);
-                    toast.setText(info);
-                    toast.show();
+                    if (closestDistance < DIST_THRESHOLD) {
+                        arGems.remove(closestPoint);
+                        String info = closestPoint.getName() + " " + context.getString(R.string.collected);
+                        toast.setText(info);
+                        toast.show();
 
-                    if (arGems.isEmpty()) {
-                        //            // Go to next Activity
-                        Intent intent = new Intent(context, TreasureFoundActivity.class);
-                        intent.putExtra(MainActivity.TREASURE_KEY, targetTreasureUUID);
-                        context.startActivity(intent);
-                        return true;
+                        viewUpdater.updateARGemsNotFound(arGems.size());
+
+                        if (arGems.isEmpty()) {
+                            onAllGemsCollected();
+                            return true;
+                        }
+                    } else {
+                        toast.setText(R.string.noGemFoundHere);
+                        toast.show();
                     }
-                } else {
-                    toast.setText(R.string.noGemFoundHere);
-                    toast.show();
+
+
+                    return true;
                 }
-
-
-                return true;
+                    return false;
             }
         };
     }

@@ -46,13 +46,9 @@ public class TreasureFoundActivity extends AppCompatActivity {
         String treasureNameText = completedQuest.getTreasure().getName();
         treasureNameView.setText(treasureNameText);
 
-        TextView avgSpeedView = findViewById(R.id.averageSpeedValue);
-        String avgSpeedText = Formatter.formatDouble(completedQuest.getAvgSpeed(), 1) + getString(R.string.speedUnit);
-        avgSpeedView.setText(avgSpeedText);
-
-        TextView temperatureView = findViewById(R.id.temperatureValue);
-        TemperatureText temperatureText = new TemperatureText(this);
-        temperatureView.setText(temperatureText.getText(completedQuest.getTemperature()));
+        TextView arGemCollectionTimeTextView = findViewById(R.id.arGemCollectionTimeValue);
+        String gemCollectionTimeText = Formatter.formatDouble(completedQuest.getGemCollectionTimeMillis()/1000, 1) + getString(R.string.timeUnitSeconds);
+        arGemCollectionTimeTextView.setText(gemCollectionTimeText);
     }
 
 

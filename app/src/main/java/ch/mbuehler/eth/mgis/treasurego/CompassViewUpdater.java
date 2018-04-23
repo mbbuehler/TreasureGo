@@ -7,7 +7,7 @@ import android.widget.TextView;
 /**
  * This class handles View updates for the CompassActivity
  */
-class CompassViewUpdater {
+class CompassViewUpdater extends ViewUpdater{
 
     /**
      * Activity whose View will be updated
@@ -17,11 +17,6 @@ class CompassViewUpdater {
      * Keep track of the time since we started the Quest
      */
     private long startTime;
-
-    /**
-     * Defines and formats the contents for temperature Text
-     */
-    private TemperatureText temperatureText;
 
     /**
      *
@@ -36,9 +31,6 @@ class CompassViewUpdater {
 
         // We keep track of when we started
         this.startTime = System.currentTimeMillis();
-
-        // Defines and formats the contents for temperature Text
-        temperatureText = new TemperatureText(activity);
     }
 
     /**
@@ -103,46 +95,6 @@ class CompassViewUpdater {
     }
 
     /**
-     * Updates the field for temperature.
-     */
-    void updateTemperature() {
-        // TODO: handle case if temperature is not available.
-        float currentTemperature = activity.getCurrentTemperature();
-        TextView temperatureView = activity.findViewById(R.id.currentTemperatureValue);
-        String temperatureString = temperatureText.getText(currentTemperature);
-        temperatureView.setText(temperatureString);
-    }
-
-    /**
-     * Updates the field for time
-     */
-    void updateTime() {
-        long millis = System.currentTimeMillis() - startTime;
-        int seconds = (int) (millis / 1000);
-        int minutes = seconds / 60;
-        int hours = minutes / 60;
-        seconds = seconds % 60;
-        minutes = minutes % 60;
-
-        TextView timerTextView = activity.findViewById(R.id.timePassedValue);
-        timerTextView.setText(String.format("%d:%02d:%02d", hours, minutes, seconds));
-    }
-
-    /**
-     * Updates the field for currently achievable reward
-     */
-    void updateCurrentReward() {
-        int currentReward = RewardCalculator.calculateReward(
-                activity.getTargetTreasure(),
-                activity.getAverageSpeed(),
-                activity.getCurrentTemperature()
-        );
-        TextView currentRewardView = activity.findViewById(R.id.CurrentRewardValue);
-        String text = String.format("%d %s", currentReward, activity.getString(R.string.coins));
-        currentRewardView.setText(text);
-    }
-
-    /**
      * Show error message when Location could not be identified.
      *
      * @param visibility View.* e.g. View.GONE
@@ -152,6 +104,15 @@ class CompassViewUpdater {
         if (locationNotFound.getVisibility() != visibility) {
             locationNotFound.setVisibility(visibility);
         }
+    }
+
+    /**
+     * Updates the field for time
+     */
+    void updateTime() {
+        TextView timerTextView = activity.findViewById(R.id.timePassedValue);
+        String formattedTimeDifference = this.getFormattedTimeDifference(startTime);
+        timerTextView.setText(formattedTimeDifference);
     }
 
 }

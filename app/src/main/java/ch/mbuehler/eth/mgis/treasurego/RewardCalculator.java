@@ -7,13 +7,9 @@ package ch.mbuehler.eth.mgis.treasurego;
 public class RewardCalculator {
 
     /**
-     * In degrees Celsius
+     * In milliseconds
      */
-    final static float[] TEMPERATURE_RANGE = new float[]{0, 30};
-    /**
-     * In m/s: 60 km/h * 1000m / 3600s = m/s
-     */
-    final static float[] SPEED_RANGE = new float[]{0, 60 * 1000 / 3600};
+    final static float[] TIME_RANGE = new float[]{0, 60 * 1000};
 
     /**
      * Calculates the reward for the given combination of variables.
@@ -21,48 +17,36 @@ public class RewardCalculator {
      * Returns the reward as number of coins (int): 0 <= reward <= maxReward
      *
      * @param treasure           Treasure
-     * @param avgSpeed           Double
-     * @param currentTemperature float
+     * @param gemCollectionTimeMillis in milliseconds
      * @return int
      */
-    static int calculateReward(Treasure treasure, Double avgSpeed, float currentTemperature) {
+    static int calculateReward(Treasure treasure, double gemCollectionTimeMillis) {
+        if(gemCollectionTimeMillis < 0){
+            // Variable has not been set.
+            return 0;
+        }
 
         // Calculate normalized values for speed and temperature
-        float normalizedSpeed = getNormalizedSpeed(avgSpeed.floatValue());
-        float normalizedTemperature = getNormalizedTemperature(currentTemperature);
+        double normalizedCollectionTime = getNormalizedCollectionTime(gemCollectionTimeMillis);
 
         // maximum achievable reward for this treasure
         int maxReward = treasure.getReward();
 
-        // Calculate the rewards for each aspect (speed and temperature)
-        float speedReward = normalizedSpeed * maxReward;
-        float temperatureReward = normalizedTemperature * maxReward;
-
         // Calculate the precise reward as a linear combination of the contributions from speed and temperature
-        float preciseReward = (float) 2 / 3 * speedReward + (float) 1 / 3 * temperatureReward;
+        double preciseReward = maxReward - normalizedCollectionTime * maxReward;
 
         // Reward is measured in coins, so we need an int.
-        return Math.round(preciseReward);
+        return (int) Math.round(preciseReward);
     }
 
     /**
      * Returns the normalized temperature.
      *
-     * @param temperature float
+     * @param timeMillis double
      * @return float
      */
-    private static float getNormalizedTemperature(float temperature) {
-        return normalizeValue(temperature, TEMPERATURE_RANGE[0], TEMPERATURE_RANGE[1]);
-    }
-
-    /**
-     * Returns the normalized speed
-     *
-     * @param speed float
-     * @return float
-     */
-    private static float getNormalizedSpeed(float speed) {
-        return normalizeValue(speed, SPEED_RANGE[0], SPEED_RANGE[1]);
+    private static double getNormalizedCollectionTime(double timeMillis) {
+        return normalizeValue(timeMillis, TIME_RANGE[0], TIME_RANGE[1]);
     }
 
     /**
@@ -75,11 +59,11 @@ public class RewardCalculator {
      * @param max   maximum of range considered
      * @return float
      */
-    private static float normalizeValue(float value, float min, float max) {
-        float valueInRange = Math.max(value, min);
+    private static double normalizeValue(double value, double min, double max) {
+        double valueInRange = Math.max(value, min);
         valueInRange = Math.min(value, max);
 
-        float normalizedValue = valueInRange / max;
+        double normalizedValue = valueInRange / max;
         return normalizedValue;
     }
 

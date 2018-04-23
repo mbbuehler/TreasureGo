@@ -120,16 +120,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /* ================== Handling Sensor Updates Section  ================== */
 
     /**
-     * Extracts the measured temperature from the sensor values and updates the View.
-     *
-     * @param sensorValues values from the Temperature Sensor
-     */
-    private void handleTemperatureUpdate(float[] sensorValues) {
-        this.currentTemperature = sensorValues[0];
-        viewUpdater.updateTemperature();
-    }
-
-    /**
      * Update the values for the rotationMatrix and orientation.
      * See
      * https://developer.android.com/guide/topics/sensors/sensors_position.html
@@ -243,10 +233,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         // Update the field that names the target Treasure
         // We only need to do that once so we do it here.
         viewUpdater.updateSearchingFor();
-        // Call this at least once.
-        // This will make sure that in case that there is no sensor available
-        // we display the information to the user.
-        viewUpdater.updateTemperature();
 
         // Create the runnable responsible for regular updates
         CompassActivityRunnable runnable = new CompassActivityRunnable(timerHandler, viewUpdater);
@@ -335,7 +321,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             this.targetReached = true;
 
             // Save Quest such that we can access it later
-            Quest completedQuest = new Quest(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature(), QuestStatus.COMPLETED);
+            Quest completedQuest = new Quest(getTargetTreasure(), QuestStatus.COMPLETED);
             GameStatus.Instance().addQuest(completedQuest);
 
             Intent intent = new Intent(this, ARActivity.class);
@@ -363,10 +349,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             case Sensor.TYPE_ROTATION_VECTOR:
                 // Update device orientation
                 handleRotationUpdate(sensorEvent.values);
-                break;
-            case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                // Update temperature related fields
-                this.handleTemperatureUpdate(sensorEvent.values);
                 break;
             default:
                 break;

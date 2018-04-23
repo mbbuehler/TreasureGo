@@ -41,7 +41,10 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     private AROverlayView arView;
     private Camera camera;
     private ARCameraView arCamera;
-    private TextView tvCurrentLocation;
+    /**
+     * Responsible for updating the View elements, e.g. distance, time, etc.
+     */
+    ARViewUpdater viewUpdater;
 
 
     // variables for camera
@@ -73,7 +76,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
         cameraContainerLayout = (FrameLayout) findViewById(R.id.camera_container_layout);
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
-        tvCurrentLocation = (TextView) findViewById(R.id.tv_current_location);
 
 
         // Obtain target Treasure from Intent
@@ -82,7 +84,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         ARGemFactory arGemFactory = new ARGemFactory();
         arGems = arGemFactory.initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15);
 
-        arView = new AROverlayView(this, arGems.keySet());
+        viewUpdater = new ARViewUpdater(this);
+
+        arView = new AROverlayView(this, arGems.keySet(), viewUpdater);
         arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
     }
 
@@ -311,8 +315,8 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     public void onLocationChanged(Location location) {
         if (arView !=null) {
             arView.updateCurrentLocation(location);
-            tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
-                    location.getLatitude(), location.getLongitude(), location.getAltitude()));
+            viewUpdater.updateTVCurrentLocation(location);
+            viewUpdater.updateTime();
         }
     }
 
