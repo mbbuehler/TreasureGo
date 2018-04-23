@@ -31,9 +31,12 @@ public class RewardCalculator {
 
         // maximum achievable reward for this treasure
         int maxReward = treasure.getReward();
+        // The user receives at least some coins
+        int minReward = (int)((float)maxReward / 2);
+        int restReward = maxReward - minReward;
 
-        // Calculate the precise reward as a linear combination of the contributions from speed and temperature
-        double preciseReward = maxReward - normalizedCollectionTime * maxReward;
+        // If the user was fast he can get additional points.
+        double preciseReward = minReward + restReward * normalizedCollectionTime;
 
         // Reward is measured in coins, so we need an int.
         return (int) Math.round(preciseReward);

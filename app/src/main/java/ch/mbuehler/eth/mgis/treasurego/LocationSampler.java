@@ -1,6 +1,7 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,22 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 
 // https://stackoverflow.com/questions/12448629/create-a-bounding-box-around-the-geo-point
-public class LocationSampler {
+class LocationSampler {
     private static final float KM_PER_MILE = 1.609344f;
     private static final float DISTANCE_BETWEEN_LATITUDE = 69 * KM_PER_MILE;
     private static final float EARTH_RADIUS = 6371;  // km
+
+    private Location center;
+    private double distanceMin;
+    private double distanceMax;
+    private double altitude;
+
+    LocationSampler(Location center, double distanceMin, double distanceMax, double altitude) {
+        this.center = center;
+        this.distanceMin = distanceMin;
+        this.distanceMax = distanceMax;
+        this.altitude = altitude;
+    }
 
     class BoundingBox{
         public BoundingBox(double latitudeMin, double latitudeMax, double longitudeMin, double longitudeMax) {
@@ -30,7 +43,7 @@ public class LocationSampler {
         double longitudeMin;
         double longitudeMax;
 
-        public Location sampleLocation(double altitude){
+        Location sampleLocation(double altitude){
             double latitudeDifference = (latitudeMax - latitudeMin);
             double longitudeDifference = (longitudeMax - longitudeMin);
 
@@ -40,7 +53,8 @@ public class LocationSampler {
             Location sampledLocation = new Location("LocationSampler");
             sampledLocation.setLatitude(sampleLatitude);
             sampledLocation.setLongitude(sampleLongitude);
-            sampledLocation.setAltitude(altitude);
+            // Add some Gaussian noise to altitude to make the placement of Gems more interesting.
+            sampledLocation.setAltitude(altitude + ThreadLocalRandom.current().nextGaussian() * 10);
 
             return sampledLocation;
         }
@@ -67,14 +81,14 @@ public class LocationSampler {
         return new BoundingBox(latitudeMin, latitudeMax, longitudeMin, longitudeMax);
     }
 
-    public List<Location> sampleLocations(int n, Location center, double distanceMin, double distanceMax){
+    public List<Location> sampleLocations(int n){
         if(distanceMin < distanceMax){
 
             List<Location> sampledLocations = new ArrayList<>();
 
             BoundingBox boundingBox = calculateBoundingBox(center, distanceMax);
             for(int i=0; i<n; ++i){
-                sampledLocations.add(sampleLocation(center, boundingBox, distanceMin, distanceMax));
+                sampledLocations.add(sampleLocation(boundingBox));
             }
 
             return sampledLocations;
@@ -83,15 +97,15 @@ public class LocationSampler {
 
     }
 
-    private boolean isValidLocation(Location location, Location center, double distanceMin, double distanceMax){
+    private boolean isValidLocation(Location location){
         double distanceToCenter = location.distanceTo(center) / 1000;  // in km
         return distanceMin <= distanceToCenter && distanceToCenter <= distanceMax;
     }
 
-    private Location sampleLocation(Location center, BoundingBox boundingBox, double distanceMin, double distanceMax){
-        Location sampledLocation = boundingBox.sampleLocation(center.getAltitude());
-        while(!isValidLocation(sampledLocation, center, distanceMin, distanceMax)){
-            sampledLocation = boundingBox.sampleLocation(center.getAltitude());
+    private Location sampleLocation(BoundingBox boundingBox){
+        Location sampledLocation = boundingBox.sampleLocation(altitude);
+        while(!isValidLocation(sampledLocation)){
+            sampledLocation = boundingBox.sampleLocation(altitude);
         }
         return sampledLocation;
     }

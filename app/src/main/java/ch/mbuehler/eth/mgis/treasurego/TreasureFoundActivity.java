@@ -25,7 +25,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
 
         // Recover Treasure from Intent
         Intent intent = getIntent();
-        String treasureUuid = intent.getStringExtra(MainActivity.TREASURE_KEY);
+        String treasureUuid = intent.getStringExtra(Constant.TREASURE_KEY);
         // Retrieve the Quest object related to this treasure,
         // i.e. last saved Quest for this Treasure
         completedQuest = GameStatus.Instance().getLastQuestForTreasureUuid(treasureUuid);

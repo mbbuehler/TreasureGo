@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -257,10 +258,12 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onPause();
         // Save battery
         this.sensorManager.unregisterListener(this);
+        this.locationManager.removeUpdates(this);
     }
 
     @Override
     public void onLocationChanged(Location currentLocation) {
+        Log.v("LOC", currentLocation.toString());
         // Set instance variable such that other methods can access it
         this.currentLocation = currentLocation;
         // Keep track of all Locations measured
@@ -303,7 +306,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         Intent intent = new Intent(this, MapsActivity.class);
         // Serialize and send the target Treasure with the Intent.
         String serializedTreasure = getTargetTreasure().serialize();
-        intent.putExtra(MainActivity.TREASURE_KEY, serializedTreasure);
+        intent.putExtra(Constant.TREASURE_KEY, serializedTreasure);
         startActivity(intent);
 
         Toast.makeText(this, R.string.hintInfo, Toast.LENGTH_LONG).show();
@@ -325,7 +328,14 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             GameStatus.Instance().addQuest(completedQuest);
 
             Intent intent = new Intent(this, ARActivity.class);
-            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().serialize());
+            intent.putExtra(Constant.TREASURE_KEY, getTargetTreasure().serialize());
+            String currentAltitudeString;
+            try {
+                currentAltitudeString = Integer.toString((int)getCurrentLocation().getAltitude());
+            } catch(LocationNotFoundException e){
+                currentAltitudeString = "0";
+            }
+            intent.putExtra(Constant.ALTITUDE_KEY, currentAltitudeString);
             startActivity(intent);
 
 

@@ -4,6 +4,7 @@ import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.StringJoiner;
@@ -15,19 +16,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ARGemFactory {
 
-    String[] arGemNames = new String[]{
-            "Spinel",
+    List<String> arGemNames = Arrays.asList("Spinel",
             "Fireopal",
             "Apatite",
             "Zircon",
             "Moonstone",
-            "Aquamarine"
-    };
+            "Aquamarine");
 
     private String sampleRandomName(){
-        int numberNames = arGemNames.length;
+        int numberNames = arGemNames.size();
         int randomIndex = ThreadLocalRandom.current().nextInt(numberNames);
-        return arGemNames[randomIndex];
+        return arGemNames.get(randomIndex);
     }
 
     ARGem getARGem(Location location){
@@ -35,11 +34,12 @@ public class ARGemFactory {
         return new ARGem(name, location);
     }
 
-
-    HashMap<ARGem, Boolean> initializeRandomARGems(int n, Location center, double distanceMin, double distanceMax){
-        LocationSampler locationSampler = new LocationSampler();
-        List<Location> arPointLocations = locationSampler.sampleLocations(n, center, distanceMin, distanceMax );
-
+    HashMap<ARGem, Boolean> initializeRandomARGems(int n, Location center,
+                                                   double distanceMin, double distanceMax,
+                                                   double altitude){
+        LocationSampler locationSampler = new LocationSampler(center, distanceMin, distanceMax, altitude);
+        List<Location> arPointLocations = locationSampler.sampleLocations(n);
+        Log.v("ALT", Double.toString(altitude));
         List<ARGem> arGemsList = new ArrayList<>();
         StringJoiner sj = new StringJoiner("],[", "[", "]");
         for(Location loc: arPointLocations){
@@ -56,4 +56,6 @@ public class ARGemFactory {
         }
         return arGemsMap;
     }
+
+
 }

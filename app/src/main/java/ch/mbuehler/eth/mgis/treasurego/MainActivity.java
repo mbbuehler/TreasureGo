@@ -18,11 +18,6 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements PermissionActionable {//implements AdapterView.OnItemSelectedListener{
 
     /**
-     * Key that is used to pass data for a treasure to other Intents
-     */
-    public static final String TREASURE_KEY = "Treasure";
-
-    /**
      * Indicate when the user has selected a Treasure. This prevents that
      * more than one CompassActivity is created.
      */
@@ -187,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                     Treasure selectedTreasure = (Treasure) parent.getAdapter().getItem(position);
                     // Serialize and send the target Treasure with the Intent.
                     String serializedTreasure = selectedTreasure.serialize();
-                    intent.putExtra(TREASURE_KEY, serializedTreasure);
+                    intent.putExtra(Constant.TREASURE_KEY, serializedTreasure);
                     // Starting the CompassActivity.
                     startActivity(intent);
                 }

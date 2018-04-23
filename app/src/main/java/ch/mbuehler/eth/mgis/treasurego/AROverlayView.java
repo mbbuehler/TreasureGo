@@ -147,7 +147,7 @@ public class AROverlayView extends View {
                 quest.setGemCollectionTimeMillis(viewUpdater.getDeltaTimeMillis(viewUpdater.getStartTime()));
 
                 Intent intent = new Intent(context, TreasureFoundActivity.class);
-                intent.putExtra(MainActivity.TREASURE_KEY, targetTreasureUUID);
+                intent.putExtra(Constant.TREASURE_KEY, targetTreasureUUID);
                 context.startActivity(intent);
 
             }
@@ -155,7 +155,7 @@ public class AROverlayView extends View {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 long currentTime = System.currentTimeMillis();
-                if(currentTime - lastTouch > DELAY_BETWEEN_TOUCHES) {
+                if(currentTime - lastTouch > DELAY_BETWEEN_TOUCHES && arGems.size() > 0) {
                     lastTouch = currentTime;
 
                     double DIST_THRESHOLD = 60;

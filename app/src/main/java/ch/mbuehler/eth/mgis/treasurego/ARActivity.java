@@ -80,9 +80,10 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         // Obtain target Treasure from Intent
         targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
+        int currentAltitude = Integer.parseInt(getIntent().getStringExtra(Constant.ALTITUDE_KEY));
 
         ARGemFactory arGemFactory = new ARGemFactory();
-        arGems = arGemFactory.initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15);
+        arGems = arGemFactory.initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
 
         viewUpdater = new ARViewUpdater(this);
 
