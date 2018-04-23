@@ -44,4 +44,6 @@
     <string name="openMap">Get hint!</string>
     <string name="hintInfo">Hint used. No more hints left. Good luck with your Quest, fearless hunter!</string>
     <string name="gpsIsLoading">GPS is loading...</string>
+    <string name="collected">collected!</string>
+    <string name="noGemFoundHere">No gem found here. Try again!</string>
 </resources>

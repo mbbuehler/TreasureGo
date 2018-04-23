@@ -78,7 +78,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * When the user gets closer to the target Treasure than this value,
      * we consider the Treasure as "found"
      */
-    private static final int DIST_TARGET_REACHED = 20; // in meters
+    private static final int DIST_TARGET_REACHED = 200; // in meters
 
     /**
      * Once the target Treasure has been reached, we want to stop updating View
@@ -338,10 +338,16 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             Quest completedQuest = new Quest(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature(), QuestStatus.COMPLETED);
             GameStatus.Instance().addQuest(completedQuest);
 
-            // Go to next Activity
-            Intent intent = new Intent(this, TreasureFoundActivity.class);
-            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
+            Intent intent = new Intent(this, ARActivity.class);
+            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().serialize());
             startActivity(intent);
+
+
+//
+//            // Go to next Activity
+//            Intent intent = new Intent(this, TreasureFoundActivity.class);
+//            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
+//            startActivity(intent);
         }
     }
 

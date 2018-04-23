@@ -8,38 +8,35 @@ import android.location.Location;
  * for rendering in the screen
  */
 
-public class ARPoint {
+public class ARGem {
     Location location;
     String name;
     double x;
     double y;
 
     /**
-     * An ARPoint represent a point in the 3D space for the AROverlayView.
+     * An ARGem represent a point in the 3D space for the AROverlayView.
      *
-     * @param name     the name of the ARPoint
-     * @param lat      latitude of the ARPoint
-     * @param lon      longitude of the ARPoint
-     * @param altitude altitude of the ARPoint
+     * @param name     the name of the ARGem
      */
-    public ARPoint(String name, Location location) {
+    public ARGem(String name, Location location) {
         this.name = name;
         this.location = location;
     }
 
     /**
-     * Returns the location of the ARPoint
+     * Returns the location of the ARGem
      *
-     * @return the ARPoint's location
+     * @return the ARGem's location
      */
     public Location getLocation() {
         return location;
     }
 
     /**
-     * Returns the Name of the ARPoint
+     * Returns the Name of the ARGem
      *
-     * @return the ARPoint's name
+     * @return the ARGem's name
      */
     public String getName() {
         return name;
@@ -50,6 +47,6 @@ public class ARPoint {
     }
 
     public String toString(){
-        return String.format("ARPoint(%f,%f)",x,y);
+        return String.format("ARGem(%f,%f)",x,y);
     }
 }

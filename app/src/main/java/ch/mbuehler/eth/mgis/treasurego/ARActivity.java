@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -56,6 +57,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     boolean isGPSEnabled;
     boolean locationServiceAvailable;
 
+    private Treasure targetTreasure;
+    HashMap<ARGem, Boolean> arGems;
+
 
     /**
      * Called when the activity is starting. Here we create the layout and initialize the arView, cameraContainerLayout and the TextView with the current location.
@@ -71,27 +75,15 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         surfaceView = (SurfaceView) findViewById(R.id.surface_view);
         tvCurrentLocation = (TextView) findViewById(R.id.tv_current_location);
 
-        // only for debugging
-        Location location = new Location("ARPoint");
-        location.setLatitude(47.4016738);
-        location.setLongitude(8.54294661);
-        location.setAltitude(65.0d);
 
+        // Obtain target Treasure from Intent
+        targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
 
-        LocationSampler locationSampler = new LocationSampler();
-        List<Location> arPointLocations = locationSampler.sampleLocations(5, location, 0.05, .15 );
+        ARGemFactory arGemFactory = new ARGemFactory();
+        arGems = arGemFactory.initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15);
 
-        List<ARPoint> arPoints = new ArrayList<>();
-        StringJoiner sj = new StringJoiner("],[", "[", "]");
-        for(Location loc: arPointLocations){
-            sj.add(String.format("%f,%f", loc.getLatitude(), loc.getLongitude()));
-            arPoints.add(new ARPoint(loc.toString(), loc));
-        }
-        Log.v("Coords", sj.toString());
-
-        arView = new AROverlayView(this,arPoints);
-        arView.setOnTouchListener(arView.getOnTouchListener());
-
+        arView = new AROverlayView(this, arGems.keySet());
+        arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
     }
 
     /**
