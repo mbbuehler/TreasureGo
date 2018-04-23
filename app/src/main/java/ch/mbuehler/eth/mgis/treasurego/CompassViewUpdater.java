@@ -111,7 +111,7 @@ class CompassViewUpdater extends ViewUpdater{
      */
     void updateTime() {
         TextView timerTextView = activity.findViewById(R.id.timePassedValue);
-        String formattedTimeDifference = this.getFormattedTimeDifference(startTime);
+        String formattedTimeDifference = this.getFormattedTimeDifference(getDeltaTimeMillis(startTime));
         timerTextView.setText(formattedTimeDifference);
     }
 
