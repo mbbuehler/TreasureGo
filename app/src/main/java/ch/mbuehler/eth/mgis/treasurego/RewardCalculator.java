@@ -4,12 +4,12 @@ package ch.mbuehler.eth.mgis.treasurego;
  * Calculates the reward for a particular game situation. The calculated reward depends on the average speed and the current temperature.
  */
 
-public class RewardCalculator {
+class RewardCalculator {
 
     /**
      * In milliseconds
      */
-    final static float[] TIME_RANGE = new float[]{0, 60 * 1000};
+    private final static float[] TIME_RANGE = new float[]{0, 60 * 1000};
 
     /**
      * Calculates the reward for the given combination of variables.

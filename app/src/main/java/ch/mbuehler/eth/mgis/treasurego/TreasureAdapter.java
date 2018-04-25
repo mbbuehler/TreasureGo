@@ -57,14 +57,14 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         // Get the data item for this position
         Treasure treasure = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        ViewHolder viewHolder; // view lookup cache stored in tag
+        // Check if an existing arActivityView is being reused, otherwise inflate the arActivityView
+        ViewHolder viewHolder; // arActivityView lookup cache stored in tag
 
         // Only create a new View if necessary
         if (convertView == null) {
             // we need to create a new View
             viewHolder = new ViewHolder();
-            // Create the view with our RelativeLayout template
+            // Create the arActivityView with our RelativeLayout template
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.treasure_row, parent, false);
             // Set the required Text- and ImageViews
@@ -92,7 +92,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
             // The Treasure has yet to be found
             viewHolder.image.setImageResource(R.drawable.treasure_closed);
         }
-        // Return the completed view
+        // Return the completed arActivityView
         return convertView;
     }
 

@@ -10,11 +10,8 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -28,15 +25,25 @@ import java.util.Set;
  * Here we override the onDraw function and we also draw the ARPoints we want. See the onDraw()
  * function and how we transform the GPS84 coordinates to camera coordinates.
  */
-
 public class AROverlayView extends View {
 
     Activity activity;
     Context context;
     private float[] rotatedProjectionMatrix = new float[16];
     private Location currentLocation;
+
+    /**
+     * Gems that the user is supposed to collect.
+     */
     private Set<ARGem> arGems;
+    /**
+     * We need access to displayed Toasts such that we can renew the content even when the old
+     * Toast is still showing, so we use an instance variable for Toast.
+     */
     private Toast toast;
+    /**
+     * Updates the Elements of the View that are not related to
+     */
     private ARViewUpdater viewUpdater;
 
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -44,15 +51,10 @@ public class AROverlayView extends View {
 
     LinearLayout lL;
 
-    RelativeLayout imgView;
-
-    boolean added = false;
-
-    RelativeLayout.LayoutParams params;
 
 
     /**
-     * Constructor of the AROverlyView class. Takes the contex and List of ARPoints as arguments.
+     * Constructor of the AROverlyView class. Takes the context and List of ARPoints as arguments.
      *
      * @param context the context creating the class
      * @param arGems  the List of ARPoints to be drawn
@@ -68,14 +70,10 @@ public class AROverlayView extends View {
 
         toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
 
-        // Initialize view
+        // Initialize arActivityView
         viewUpdater.updateARGemsNotFound(arGems.size());
 
-        imgView = (RelativeLayout) View.inflate(context, R.layout.image_gemview, null);
 
-        params = new RelativeLayout.LayoutParams(30, 40);
-        params.leftMargin = 50;
-        params.topMargin = 60;
 
 
 
@@ -90,7 +88,7 @@ public class AROverlayView extends View {
         this.rotatedProjectionMatrix = rotatedProjectionMatrix;
 
         // Here we force the View to be redrawn. So each time we update the projection matrix
-        // the view is redrawn
+        // the arActivityView is redrawn
         this.invalidate();
     }
 
@@ -103,12 +101,12 @@ public class AROverlayView extends View {
         this.currentLocation = currentLocation;
 
         // Here we force the View to be redrawn. So each time we update the projection matrix
-        // the view is redrawn
+        // the arActivityView is redrawn
         this.invalidate();
     }
 
     /**
-     * Called when the view should render its content. If the current Location is valid, we
+     * Called when the arActivityView should render its content. If the current Location is valid, we
      * calculate the positions of each of the ARGem corresponding to the user's current position
      * and draw them.
      *
@@ -155,14 +153,12 @@ public class AROverlayView extends View {
                 float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
                 float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
 
-                arGem.x = x;
-                arGem.y = y;
+                // We need to keep track of the position of the ARGems
+                arGem.setX(x);
+                arGem.setY(y);
 
-
-
-                imgView.setVisibility(View.VISIBLE);
-                RelativeLayout view = activity.findViewById(R.id.activity_ar);
-                //view.addView(imgView);
+//                imgView.setVisibility(View.VISIBLE);
+                //arActivityView.addView(imgView);
 
                 // placing the edit text at specific co-ordinates:
                 //canvas.translate(0, 0);
@@ -171,81 +167,17 @@ public class AROverlayView extends View {
                 canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
 
 
-                if(!added){
-                    view.addView(imgView, params);
-                    added = true;
-                }
-
-                //imgView.layout(100,100,0,0);
-
-                params.leftMargin = (int)x;
-                params.topMargin = (int)y;
-//                imgView.layout((int)x, (int)y, 0, 0);
+                viewUpdater.updateGemParams((int)x, (int)y);
             }
         }
     }
 
+    /**
+     * Returns the OnTouchListener for this View.
+     * @param targetTreasureUUID UUID of target Treasure
+     * @return instance of AROverlayViewOnTouchListener, initialized with the variables of this View.
+     */
     public OnTouchListener getOnTouchListener(final String targetTreasureUUID) {
-        return new OnTouchListener() {
-
-            private long lastTouch = 0;
-            private final long DELAY_BETWEEN_TOUCHES = 200;  // ms
-
-            private void onAllGemsCollected(){
-                //            // Go to next Activity
-                Quest quest = GameStatus.Instance().getLastQuestForTreasureUuid(targetTreasureUUID);
-                quest.setGemCollectionTimeMillis(viewUpdater.getDeltaTimeMillis(viewUpdater.getStartTime()));
-
-                Intent intent = new Intent(context, TreasureFoundActivity.class);
-                intent.putExtra(Constant.TREASURE_KEY, targetTreasureUUID);
-                context.startActivity(intent);
-
-            }
-
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                long currentTime = System.currentTimeMillis();
-                if(currentTime - lastTouch > DELAY_BETWEEN_TOUCHES && arGems.size() > 0) {
-                    lastTouch = currentTime;
-
-                    double DIST_THRESHOLD = 60;
-
-                    double x = motionEvent.getX();
-                    double y = motionEvent.getY();
-                    Log.v("TOUCH", String.format("%f, %f", x, y));
-
-                    double closestDistance = 99999999;
-                    ARGem closestPoint = null;
-                    for (ARGem arGem : arGems) {
-                        double distance = arGem.euclideanDistanceTo(x, y);
-                        if (closestPoint == null || distance < closestDistance) {
-                            closestPoint = arGem;
-                            closestDistance = distance;
-                        }
-                    }
-
-                    if (closestDistance < DIST_THRESHOLD) {
-                        arGems.remove(closestPoint);
-                        String info = closestPoint.getName() + " " + context.getString(R.string.collected);
-                        toast.setText(info);
-                        toast.show();
-
-                        viewUpdater.updateARGemsNotFound(arGems.size());
-
-                        if (arGems.isEmpty()) {
-                            onAllGemsCollected();
-                            return true;
-                        }
-                    } else {
-                        toast.setText(R.string.noGemFoundHere);
-                        toast.show();
-                    }
-
-
-                    return true;
-                }
-                    return false;
-            }
-        };
+        return new AROverlayViewOnTouchListener(targetTreasureUUID, context, arGems, toast, viewUpdater);
     }
 }

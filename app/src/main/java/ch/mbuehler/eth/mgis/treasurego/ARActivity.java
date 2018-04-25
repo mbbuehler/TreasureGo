@@ -28,12 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringJoiner;
 
-/**
- * Created by marcello on 21/04/18.
- */
 
 public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener{
-
 
     //Variables for GUI
     private SurfaceView surfaceView;
@@ -46,7 +42,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
      */
     ARViewUpdater viewUpdater;
 
-
     // variables for camera
     private SensorManager sensorManager;
     private final static int REQUEST_CAMERA_PERMISSIONS_CODE = 11;
@@ -58,7 +53,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
     private LocationManager locationManager;
     boolean isGPSEnabled;
-    boolean locationServiceAvailable;
 
     private Treasure targetTreasure;
     HashMap<ARGem, Boolean> arGems;
@@ -74,20 +68,22 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         setContentView(R.layout.activity_aractivity);
 
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
-        cameraContainerLayout = (FrameLayout) findViewById(R.id.camera_container_layout);
-        surfaceView = (SurfaceView) findViewById(R.id.surface_view);
-
+        cameraContainerLayout = findViewById(R.id.camera_container_layout);
+        surfaceView = findViewById(R.id.surface_view);
 
         // Obtain target Treasure from Intent
         targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
+
+        // Current altitude of user
         int currentAltitude = Integer.parseInt(getIntent().getStringExtra(Constant.ALTITUDE_KEY));
 
-        ARGemFactory arGemFactory = new ARGemFactory();
-        arGems = arGemFactory.initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
+        // Create the ARGems that the user is supposed to collect
+        arGems = new ARGemFactory().initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
 
         viewUpdater = new ARViewUpdater(this);
 
         arView = new AROverlayView(this, arGems.keySet(), viewUpdater, this);
+        // This listener handles onTouchEvents, e.g. collecting ARGems
         arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
     }
 
@@ -121,13 +117,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                 SensorManager.SENSOR_DELAY_FASTEST);
 
         initAROverlayView();
-
-        // sending a test location to initialize the GPS and not to have to go out to test the app
-        Location testlocation = new Location("testLocation");
-        testlocation.setLatitude(47.40872637);
-        testlocation.setLongitude(8.50718482);
-        testlocation.setAltitude(596.0);
-        onLocationChanged(testlocation);
     }
 
     /**
@@ -191,7 +180,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                     initARCameraView();
 
                 } else {
-
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -201,7 +189,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     }
 
     /**
-     * Initiliaze the GUI elements to draw the AR Points
+     * Initialize the GUI elements to draw the AR Points
      */
     public void initAROverlayView() {
 
@@ -240,7 +228,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                 camera.startPreview();
                 arCamera.setCamera(camera);
             } catch (RuntimeException ex){
-                Toast.makeText(this, "Camera not found", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.cameraNotFound, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -294,7 +282,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
             Matrix.multiplyMM(rotatedProjectionMatrix, 0, projectionMatrix, 0, rotationMatrixFromVector, 0);
             this.arView.updateRotatedProjectionMatrix(rotatedProjectionMatrix);
         }
-
     }
 
     /**

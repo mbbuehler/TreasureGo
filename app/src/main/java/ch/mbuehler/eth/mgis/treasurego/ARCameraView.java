@@ -52,10 +52,10 @@ public class ARCameraView extends ViewGroup implements SurfaceHolder.Callback {
 
     /**
      * Constructor of the ARCameraView. It takes the context and a SurfaceView as parameters.
-     * The SurfaceView is used to draw the AR content on the Camera view.
+     * The SurfaceView is used to draw the AR content on the Camera arActivityView.
      *
      * @param context     context of the ARCameraView
-     * @param surfaceView drawing surface for drawing on the camera view
+     * @param surfaceView drawing surface for drawing on the camera arActivityView
      */
     public ARCameraView(Context context, SurfaceView surfaceView) {
         super(context);
@@ -89,7 +89,7 @@ public class ARCameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     /**
-     * Measure the view and its content to determine the measured width and the measured height.
+     * Measure the arActivityView and its content to determine the measured width and the measured height.
      * See https://developer.android.com/guide/topics/ui/how-android-draws.html
      *
      * @param widthMeasureSpec  horizontal space requirements as imposed by the parent.
@@ -111,9 +111,9 @@ public class ARCameraView extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     /**
-     * Called from layout when this view should assign a size and position to each of its children.
+     * Called from layout when this arActivityView should assign a size and position to each of its children.
      *
-     * @param changed Indicates if this is a new size or position for this view
+     * @param changed Indicates if this is a new size or position for this arActivityView
      * @param left    Left position, relative to parent
      * @param top     Top position, relative to parent
      * @param right   Right position, relative to parent

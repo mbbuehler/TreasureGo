@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         permissionChecker = new PermissionChecker(this);
         // Ask for permissions if the user has not already denied that twice
         permissionChecker.checkPermissions(permissions);
-
     }
 
     @Override
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
             resetTreasures();
             GameStatus.Instance().setHasBeenInitialized(true);
         } else {
-            // The game has already been initialized. Update the view such that we can see which
+            // The game has already been initialized. Update the arActivityView such that we can see which
             // Treasures we have already found.
             updateTreasureListview();
         }
@@ -100,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                 permissionChecker.checkPermissions(permissions);
             }
         }, 3000);
-        // It was the first time we ask the user. Give him one more chance.}
+        // It was the first time we ask the user. Give him one more chance.
     }
 
     /**
@@ -146,10 +145,10 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         // We use a custom Adapter such that we can display each Treasure with name, reward and an image
         TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getTreasureQuests(), getApplicationContext());
 
-        // This view holds the Treasures to be selected
+        // This arActivityView holds the Treasures to be selected
         final ListView treasureListView = findViewById(R.id.treasurelistview);
 
-        // The adapter adds the data to the view
+        // The adapter adds the data to the arActivityView
         treasureListView.setAdapter(adapter);
 
         // Set the listener that should wait for a user selection

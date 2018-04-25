@@ -23,7 +23,6 @@ public class Quest {
 
     /**
      * @param treasure    Target Treasure
-     * @param gemCollectionTimeMillis    time for collecting gems in AR view (in milliseconds)
      * @param status      COMPLETED
      */
     public Quest(Treasure treasure, QuestStatus status) {

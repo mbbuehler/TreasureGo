@@ -3,23 +3,20 @@ package ch.mbuehler.eth.mgis.treasurego;
 import android.location.Location;
 
 /**
- * Created by vanagnos on 03.04.2017. Updated by goebelf on 18.04.2018.
- * A simple class to represent a point in the 3D space that we will use
- * for rendering in the screen
+ * Simple class representing an ARGem that can be rendered on the screen.
  */
-
 public class ARGem {
-    Location location;
-    String name;
-    double x;
-    double y;
+    private Location location;
+    private String name;
+    private double x;
+    private double y;
 
     /**
      * An ARGem represent a point in the 3D space for the AROverlayView.
      *
      * @param name     the name of the ARGem
      */
-    public ARGem(String name, Location location) {
+    ARGem(String name, Location location) {
         this.name = name;
         this.location = location;
     }
@@ -42,11 +39,27 @@ public class ARGem {
         return name;
     }
 
-    public double euclideanDistanceTo(double x, double y){
+    double euclideanDistanceTo(double x, double y){
         return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 
     public String toString(){
         return String.format("ARGem(%f,%f)",x,y);
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 }

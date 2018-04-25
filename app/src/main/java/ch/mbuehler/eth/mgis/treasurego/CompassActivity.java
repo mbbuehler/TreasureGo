@@ -135,7 +135,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     /**
      * Distance to target Treasure has changed. If we are close enough to the target Treasure,
-     * we will call onTargetReached(). If not we will update the view with the current distance.
+     * we will call onTargetReached(). If not we will update the arActivityView with the current distance.
      */
     private void handleDistanceToTargetUpdate() {
 
@@ -220,7 +220,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        // Instantiate instances for view updates and locationTracking
+        // Instantiate instances for arActivityView updates and locationTracking
         viewUpdater = new CompassViewUpdater(this);
         locationTracker = new LocationTracker();
 
@@ -324,26 +324,25 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             this.targetReached = true;
 
             // Save Quest such that we can access it later
-            Quest completedQuest = new Quest(getTargetTreasure(), QuestStatus.COMPLETED);
+            Quest completedQuest = new Quest(getTargetTreasure(), QuestStatus.SEARCHING_GEMS);
             GameStatus.Instance().addQuest(completedQuest);
 
             Intent intent = new Intent(this, ARActivity.class);
             intent.putExtra(Constant.TREASURE_KEY, getTargetTreasure().serialize());
+
+            // We want to set the gems in the AR View more or less equal to the target position.
+            // However, as we do not know the altitude of the target position we approximate
+            // it via the altitude of position from where the AR View is launched.
             String currentAltitudeString;
             try {
                 currentAltitudeString = Integer.toString((int)getCurrentLocation().getAltitude());
             } catch(LocationNotFoundException e){
+                // use a default altitude
                 currentAltitudeString = "0";
             }
             intent.putExtra(Constant.ALTITUDE_KEY, currentAltitudeString);
+
             startActivity(intent);
-
-
-//
-//            // Go to next Activity
-//            Intent intent = new Intent(this, TreasureFoundActivity.class);
-//            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
-//            startActivity(intent);
         }
     }
 
