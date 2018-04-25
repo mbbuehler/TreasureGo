@@ -87,7 +87,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         viewUpdater = new ARViewUpdater(this);
 
-        arView = new AROverlayView(this, arGems.keySet(), viewUpdater);
+        arView = new AROverlayView(this, arGems.keySet(), viewUpdater, this);
         arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
     }
 

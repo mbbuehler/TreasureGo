@@ -35,13 +35,8 @@
             android:name=".TreasureFoundActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ARActivity" >
-
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            android:name=".ARActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".MapsActivity"

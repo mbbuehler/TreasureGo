@@ -1,5 +1,6 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -9,8 +10,13 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.Set;
@@ -25,6 +31,7 @@ import java.util.Set;
 
 public class AROverlayView extends View {
 
+    Activity activity;
     Context context;
     private float[] rotatedProjectionMatrix = new float[16];
     private Location currentLocation;
@@ -32,14 +39,28 @@ public class AROverlayView extends View {
     private Toast toast;
     private ARViewUpdater viewUpdater;
 
+    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+
+    LinearLayout lL;
+
+    RelativeLayout imgView;
+
+    boolean added = false;
+
+    RelativeLayout.LayoutParams params;
+
+
     /**
      * Constructor of the AROverlyView class. Takes the contex and List of ARPoints as arguments.
      *
      * @param context the context creating the class
      * @param arGems  the List of ARPoints to be drawn
      */
-    public AROverlayView(Context context, Set<ARGem> arGems, ARViewUpdater viewUpdater) {
+    public AROverlayView(Context context, Set<ARGem> arGems, ARViewUpdater viewUpdater, Activity activity) {
         super(context);
+
+        this.activity = activity;
 
         this.context = context;
         this.arGems = arGems;
@@ -49,6 +70,15 @@ public class AROverlayView extends View {
 
         // Initialize view
         viewUpdater.updateARGemsNotFound(arGems.size());
+
+        imgView = (RelativeLayout) View.inflate(context, R.layout.image_gemview, null);
+
+        params = new RelativeLayout.LayoutParams(30, 40);
+        params.leftMargin = 50;
+        params.topMargin = 60;
+
+
+
     }
 
     /**
@@ -96,7 +126,6 @@ public class AROverlayView extends View {
 
         // variables for the point representation
         final int radius = 30;
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.WHITE);
         paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
@@ -129,8 +158,29 @@ public class AROverlayView extends View {
                 arGem.x = x;
                 arGem.y = y;
 
-                canvas.drawCircle(x, y, radius, paint);
+
+
+                imgView.setVisibility(View.VISIBLE);
+                RelativeLayout view = activity.findViewById(R.id.activity_ar);
+                //view.addView(imgView);
+
+                // placing the edit text at specific co-ordinates:
+                //canvas.translate(0, 0);
+
+                              canvas.drawCircle(x, y, radius, paint);
                 canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
+
+
+                if(!added){
+                    view.addView(imgView, params);
+                    added = true;
+                }
+
+                //imgView.layout(100,100,0,0);
+
+                params.leftMargin = (int)x;
+                params.topMargin = (int)y;
+//                imgView.layout((int)x, (int)y, 0, 0);
             }
         }
     }

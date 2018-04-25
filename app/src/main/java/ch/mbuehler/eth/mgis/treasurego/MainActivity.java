@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         permissionChecker = new PermissionChecker(this);
         // Ask for permissions if the user has not already denied that twice
         permissionChecker.checkPermissions(permissions);
+
     }
 
     @Override
