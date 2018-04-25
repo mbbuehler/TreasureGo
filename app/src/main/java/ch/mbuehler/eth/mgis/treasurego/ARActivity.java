@@ -20,16 +20,12 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.StringJoiner;
 
 
-public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener{
+public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
 
     //Variables for GUI
     private SurfaceView surfaceView;
@@ -60,6 +56,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
     /**
      * Called when the activity is starting. Here we create the layout and initialize the arView, cameraContainerLayout and the TextView with the current location.
+     *
      * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
      */
     @Override
@@ -80,9 +77,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         // Create the ARGems that the user is supposed to collect
         arGems = new ARGemFactory().initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
 
-        viewUpdater = new ARViewUpdater(this);
+        viewUpdater = new ARViewUpdater(this, arGems.keySet());
 
-        arView = new AROverlayView(this, arGems.keySet(), viewUpdater, this);
+        arView = new AROverlayView(this, viewUpdater);
         // This listener handles onTouchEvents, e.g. collecting ARGems
         arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
     }
@@ -136,7 +133,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         sensorManager.unregisterListener(this);
 
 
-        if(camera != null) {
+        if (camera != null) {
             camera.setPreviewCallback(null);
             camera.stopPreview();
             arCamera.setCamera(null);
@@ -150,8 +147,8 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     /**
      * Callback for the result from requesting permissions. Checks if the user allowed to use the camera and the location.
      *
-     * @param requestCode The request code passed
-     * @param permissions The requested permissions.
+     * @param requestCode  The request code passed
+     * @param permissions  The requested permissions.
      * @param grantResults The grant results for the corresponding permissions which is either PERMISSION_GRANTED or PERMISSION_DENIED.
      */
     @Override
@@ -173,7 +170,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                 return;
             }
 
-            case REQUEST_CAMERA_PERMISSIONS_CODE:{
+            case REQUEST_CAMERA_PERMISSIONS_CODE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
@@ -200,7 +197,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     }
 
     /**
-     *
      * Initiliaze the GUI elements and the camera View
      */
     public void initARCameraView() {
@@ -222,12 +218,12 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         //initCamera
         int numCams = Camera.getNumberOfCameras();
-        if(numCams > 0){
-            try{
+        if (numCams > 0) {
+            try {
                 camera = Camera.open();
                 camera.startPreview();
                 arCamera.setCamera(camera);
-            } catch (RuntimeException ex){
+            } catch (RuntimeException ex) {
                 Toast.makeText(this, R.string.cameraNotFound, Toast.LENGTH_LONG).show();
             }
         }
@@ -238,23 +234,23 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
      */
     private void initLocationService() {
 
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
-            return  ;
+        if (Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
 
-        try   {
+        try {
             locationManager = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
 
             // Get GPS status
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-            if (isGPSEnabled)  {
+            if (isGPSEnabled) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         MIN_TIME_BW_UPDATES,
                         MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
             }
-        } catch (Exception ex)  {
+        } catch (Exception ex) {
             Log.e("MainActivity", ex.getMessage());
 
         }
@@ -262,6 +258,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
     /**
      * Called when there is a new sensor event. We use this to recalculate our projectionMatrix according to the new phone orientation.
+     *
      * @param event the SensorEvent
      */
     @Override
@@ -287,7 +284,8 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     /**
      * Called when the accuracy of the registered sensor has changed.
      * We do nothing when this event happens.
-     * @param sensor the Sensor that has ne accuracy
+     *
+     * @param sensor   the Sensor that has ne accuracy
      * @param accuracy The new accuracy of this sensor
      */
     @Override
@@ -297,11 +295,12 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
     /**
      * Called when a new user location is known. If this happens, we need to update the currentLocation for the ARView and the TextView that displays the current location.
+     *
      * @param location The new location
      */
     @Override
     public void onLocationChanged(Location location) {
-        if (arView !=null) {
+        if (arView != null) {
             arView.updateCurrentLocation(location);
             viewUpdater.updateTVCurrentLocation(location);
             viewUpdater.updateTime();
@@ -311,9 +310,10 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     /**
      * Called when the provider status changes.
      * We do nothing when this event happens.
+     *
      * @param provider The name of the location provider associated with this update.
-     * @param status OUT_OF_SERVICE if the provider is out of service, and this is not expected to change in the near future; TEMPORARILY_UNAVAILABLE if the provider is temporarily unavailable but is expected to be available shortly; and AVAILABLE if the provider is currently available.
-     * @param extras an optional Bundle which will contain provider specific status variables.
+     * @param status   OUT_OF_SERVICE if the provider is out of service, and this is not expected to change in the near future; TEMPORARILY_UNAVAILABLE if the provider is temporarily unavailable but is expected to be available shortly; and AVAILABLE if the provider is currently available.
+     * @param extras   an optional Bundle which will contain provider specific status variables.
      */
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -323,6 +323,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     /**
      * Called when the provider is enabled by the user.
      * We do nothing when this event happens.
+     *
      * @param provider the name of the location provider associated with this update.
      */
     @Override
@@ -333,6 +334,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     /**
      * Called when the provider is disabled by the user. If requestLocationUpdates is called on an already disabled provider, this method is called immediately.
      * We do nothing when this event happens. However, we could tell the user to re-enable the provider as our app uses it.
+     *
      * @param provider the name of the location provider associated with this update.
      */
     @Override

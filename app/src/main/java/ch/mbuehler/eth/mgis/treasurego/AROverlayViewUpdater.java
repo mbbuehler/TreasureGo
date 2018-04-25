@@ -18,21 +18,7 @@ import java.util.Set;
  * Created by marcello on 23/04/18.
  */
 
-public class ARViewUpdater extends ViewUpdater {
-    /**
-     * Activity whose View will be updated
-     */
-    private ARActivity activity;
-    /**
-     * Keep track of the time since we started the Quest
-     */
-    private long startTime;
-
-    private TextView timerTextView;
-
-    private TextView tvCurrentLocation;
-
-    private TextView arGemsNotFoundTextView;
+public class AROverlayViewUpdater extends ViewUpdater {
 
     long lastDrawUpdate = System.currentTimeMillis();
     long DELTA_DRAW_UPDATE = 1;
@@ -42,8 +28,6 @@ public class ARViewUpdater extends ViewUpdater {
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     RelativeLayout arActivityView;
-
-    RelativeLayout.LayoutParams params;
 
     class ARGemLayout{
         RelativeLayout layout;
@@ -64,8 +48,7 @@ public class ARViewUpdater extends ViewUpdater {
     /**
      * @param activity Activity whose View will be updated
      */
-    ARViewUpdater(ARActivity activity, Set<ARGem> arGems) {
-        this.activity = activity;
+    AROverlayViewUpdater(ARActivity activity, Set<ARGem> arGems) {
         arActivityView = activity.findViewById(R.id.activity_ar);
 
         for(ARGem arGem: arGems){
@@ -75,44 +58,6 @@ public class ARViewUpdater extends ViewUpdater {
             arGemLayouts.put(arGem, gemLayout);
             arActivityView.addView(layout, gemLayout.params);
         }
-
-        // We keep track of when we started
-        this.startTime = System.currentTimeMillis();
-
-        timerTextView = activity.findViewById(R.id.timePassedValue);
-        tvCurrentLocation = activity.findViewById(R.id.tv_current_location);
-        arGemsNotFoundTextView = activity.findViewById(R.id.arGemsNotFound);
-
-        // Initialize arActivityView
-        updateARGemsNotFound(arGems.size());
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    /**
-     * Updates the field for time
-     */
-    void updateTime() {
-        String formattedTimeDifference = this.getFormattedTimeDifference(getDeltaTimeMillis(startTime));
-        timerTextView.setText(formattedTimeDifference);
-    }
-
-    void updateTVCurrentLocation(Location location){
-
-    tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
-            location.getLatitude(), location.getLongitude(), location.getAltitude()));
-
-    }
-
-    /**
-     * Updates TextView that shows the user how many Gems are left to find.
-     * @param numberARGemsNotFound number of ARGems that have not been collected
-     */
-    void updateARGemsNotFound(int numberARGemsNotFound){
-        String text = String.format("%d %s", numberARGemsNotFound, activity.getString(R.string.arGemsLeft));
-        arGemsNotFoundTextView.setText(text);
     }
 
     void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){

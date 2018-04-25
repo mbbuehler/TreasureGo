@@ -2,6 +2,7 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -51,10 +52,10 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
     private final long DELAY_BETWEEN_TOUCHES = 200;  // ms
 
 
-    AROverlayViewOnTouchListener(String targetTreasureUUID, Context context, Set<ARGem> arGems, Toast toast, ARViewUpdater viewUpdater) {
+    AROverlayViewOnTouchListener(String targetTreasureUUID, Context context, Toast toast, ARViewUpdater viewUpdater) {
         this.targetTreasureUUID = targetTreasureUUID;
         this.context = context;
-        this.arGems = arGems;
+        this.arGems = viewUpdater.arGemLayouts.keySet();
         this.toast = toast;
         this.viewUpdater = viewUpdater;
     }
@@ -98,6 +99,8 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
             double x = motionEvent.getX();
             double y = motionEvent.getY();
 
+            Log.v("XY", String.format("%d,%d",(int)x, (int)y));
+
             // Find closest ARGem
             ARGem closestARGem = findClosestGem(x, y);
             double closestDistance = closestARGem.euclideanDistanceTo(x, y);
@@ -106,6 +109,8 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
             if (closestDistance < TOUCH_DISTANCE_THRESHOLD) {
                 // We can't collect this Gem again.
                 arGems.remove(closestARGem);
+                viewUpdater.arActivityView.removeView(viewUpdater.arGemLayouts.get(closestARGem).layout);
+
 
                 // Inform user about his success.
                 String info = closestARGem.getName() + " " + context.getString(R.string.collected);

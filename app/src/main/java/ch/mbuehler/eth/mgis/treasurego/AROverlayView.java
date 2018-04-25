@@ -18,16 +18,9 @@ import java.util.Set;
  * function and how we transform the GPS84 coordinates to camera coordinates.
  */
 public class AROverlayView extends View {
-
-    Activity activity;
     Context context;
     private float[] rotatedProjectionMatrix = new float[16];
     private Location currentLocation;
-
-    /**
-     * Gems that the user is supposed to collect.
-     */
-    private Set<ARGem> arGems;
     /**
      * We need access to displayed Toasts such that we can renew the content even when the old
      * Toast is still showing, so we use an instance variable for Toast.
@@ -43,22 +36,14 @@ public class AROverlayView extends View {
      * Constructor of the AROverlyView class. Takes the context and List of ARPoints as arguments.
      *
      * @param context the context creating the class
-     * @param arGems  the List of ARPoints to be drawn
      */
-    public AROverlayView(Context context, Set<ARGem> arGems, ARViewUpdater viewUpdater, Activity activity) {
+    public AROverlayView(Context context, ARViewUpdater viewUpdater) {
         super(context);
 
-        this.activity = activity;
-
         this.context = context;
-        this.arGems = arGems;
         this.viewUpdater = viewUpdater;
 
         toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
-
-        // Initialize arActivityView
-        viewUpdater.updateARGemsNotFound(arGems.size());
-
     }
 
     /**
@@ -105,7 +90,7 @@ public class AROverlayView extends View {
         }
 
         // Update dynamic elements of View
-        viewUpdater.updateOnDraw(canvas, currentLocation, arGems, rotatedProjectionMatrix);
+        viewUpdater.updateOnDraw(canvas, currentLocation, rotatedProjectionMatrix);
     }
 
     /**
@@ -115,6 +100,6 @@ public class AROverlayView extends View {
      * @return instance of AROverlayViewOnTouchListener, initialized with the variables of this View.
      */
     public OnTouchListener getOnTouchListener(final String targetTreasureUUID) {
-        return new AROverlayViewOnTouchListener(targetTreasureUUID, context, arGems, toast, viewUpdater);
+        return new AROverlayViewOnTouchListener(targetTreasureUUID, context, toast, viewUpdater);
     }
 }

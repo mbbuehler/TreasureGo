@@ -16,22 +16,27 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class ARGemFactory {
 
-    List<String> arGemNames = Arrays.asList("Spinel",
-            "Fireopal",
-            "Apatite",
-            "Zircon",
-            "Moonstone",
-            "Aquamarine");
+    HashMap<String, Integer> gemData;
+
+    public ARGemFactory() {
+        gemData = new HashMap<>();
+        gemData.put("Fireopal", R.drawable.fireopal_small);
+        gemData.put("Apatite", R.drawable.apatite_small);
+        gemData.put("Zircon", R.drawable.zircon_small);
+        gemData.put("Moonstone", R.drawable.moonstone_small);
+        gemData.put("Aquamarine", R.drawable.aquamarine_small);
+    }
 
     private String sampleRandomName(){
-        int numberNames = arGemNames.size();
+        int numberNames = gemData.keySet().size();
         int randomIndex = ThreadLocalRandom.current().nextInt(numberNames);
-        return arGemNames.get(randomIndex);
+        return (String)gemData.keySet().toArray()[randomIndex];
     }
 
     ARGem getARGem(Location location){
         String name = sampleRandomName();
-        return new ARGem(name, location);
+        int imageId = gemData.get(name);
+        return new ARGem(name, location, imageId);
     }
 
     HashMap<ARGem, Boolean> initializeRandomARGems(int n, Location center,

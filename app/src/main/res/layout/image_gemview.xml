@@ -7,6 +7,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <ImageView
+    android:id="@+id/image_gem"
     android:layout_width="@dimen/gem_width"
     android:layout_height="@dimen/gem_height"
     app:srcCompat="@drawable/fireopal_small"

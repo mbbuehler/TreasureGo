@@ -8,6 +8,7 @@ import android.location.Location;
 public class ARGem {
     private Location location;
     private String name;
+    private int imageId;
     private double x;
     private double y;
 
@@ -16,9 +17,10 @@ public class ARGem {
      *
      * @param name     the name of the ARGem
      */
-    ARGem(String name, Location location) {
+    ARGem(String name, Location location, int imageId) {
         this.name = name;
         this.location = location;
+        this.imageId = imageId;
     }
 
     /**
@@ -61,5 +63,9 @@ public class ARGem {
 
     public void setY(double y) {
         this.y = y;
+    }
+
+    public int getImageId() {
+        return imageId;
     }
 }
