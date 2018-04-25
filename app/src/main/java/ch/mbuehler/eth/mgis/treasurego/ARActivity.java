@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.util.HashMap;
+import java.util.Set;
 
 
 public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
@@ -50,7 +51,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     private LocationManager locationManager;
     boolean isGPSEnabled;
 
-    private Treasure targetTreasure;
+    Treasure targetTreasure;
     HashMap<ARGem, Boolean> arGems;
 
 
@@ -79,9 +80,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         viewUpdater = new ARViewUpdater(this, arGems.keySet());
 
-        arView = new AROverlayView(this, viewUpdater);
+        arView = new AROverlayView(this, new AROverlayViewUpdater(this, arGems.keySet()));
         // This listener handles onTouchEvents, e.g. collecting ARGems
-        arView.setOnTouchListener(arView.getOnTouchListener(targetTreasure.getUuid()));
+        arView.setOnTouchListener(arView.getOnTouchListener());
     }
 
     /**
@@ -340,5 +341,13 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     @Override
     public void onProviderDisabled(String provider) {
         //do nothing
+    }
+
+    public Set<ARGem> getARGems(){
+        return arGems.keySet();
+    }
+
+    public void removeARGem(ARGem arGem){
+        this.arGems.remove(arGem);
     }
 }

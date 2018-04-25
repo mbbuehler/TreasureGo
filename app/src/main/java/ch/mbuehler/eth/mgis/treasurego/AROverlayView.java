@@ -29,7 +29,7 @@ public class AROverlayView extends View {
     /**
      * Updates the Elements of the View that are not related to
      */
-    private ARViewUpdater viewUpdater;
+    private AROverlayViewUpdater viewUpdater;
 
 
     /**
@@ -37,7 +37,7 @@ public class AROverlayView extends View {
      *
      * @param context the context creating the class
      */
-    public AROverlayView(Context context, ARViewUpdater viewUpdater) {
+    public AROverlayView(Context context, AROverlayViewUpdater viewUpdater) {
         super(context);
 
         this.context = context;
@@ -99,7 +99,7 @@ public class AROverlayView extends View {
      * @param targetTreasureUUID UUID of target Treasure
      * @return instance of AROverlayViewOnTouchListener, initialized with the variables of this View.
      */
-    public OnTouchListener getOnTouchListener(final String targetTreasureUUID) {
-        return new AROverlayViewOnTouchListener(targetTreasureUUID, context, toast, viewUpdater);
+    public OnTouchListener getOnTouchListener() {
+        return new AROverlayViewOnTouchListener(viewUpdater);
     }
 }

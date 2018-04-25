@@ -32,7 +32,6 @@ public class ARViewUpdater extends ViewUpdater {
 
     private TextView tvCurrentLocation;
 
-    private TextView arGemsNotFoundTextView;
 
     long lastDrawUpdate = System.currentTimeMillis();
     long DELTA_DRAW_UPDATE = 1;
@@ -66,30 +65,25 @@ public class ARViewUpdater extends ViewUpdater {
      */
     ARViewUpdater(ARActivity activity, Set<ARGem> arGems) {
         this.activity = activity;
-        arActivityView = activity.findViewById(R.id.activity_ar);
-
-        for(ARGem arGem: arGems){
-            RelativeLayout layout = (RelativeLayout) View.inflate(activity, R.layout.image_gemview, null);
-            ARGemLayout gemLayout = new ARGemLayout(layout);
-            ((ImageView)gemLayout.layout.findViewById(R.id.image_gem)).setImageResource(arGem.getImageId());
-            arGemLayouts.put(arGem, gemLayout);
-            arActivityView.addView(layout, gemLayout.params);
-        }
+//        arActivityView = activity.findViewById(R.id.activity_ar);
+//
+//        for(ARGem arGem: arGems){
+//            RelativeLayout layout = (RelativeLayout) View.inflate(activity, R.layout.image_gemview, null);
+//            ARGemLayout gemLayout = new ARGemLayout(layout);
+//            ((ImageView)gemLayout.layout.findViewById(R.id.image_gem)).setImageResource(arGem.getImageId());
+//            arGemLayouts.put(arGem, gemLayout);
+//            arActivityView.addView(layout, gemLayout.params);
+//        }
 
         // We keep track of when we started
         this.startTime = System.currentTimeMillis();
 
         timerTextView = activity.findViewById(R.id.timePassedValue);
         tvCurrentLocation = activity.findViewById(R.id.tv_current_location);
-        arGemsNotFoundTextView = activity.findViewById(R.id.arGemsNotFound);
 
-        // Initialize arActivityView
-        updateARGemsNotFound(arGems.size());
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
+
 
     /**
      * Updates the field for time
@@ -106,62 +100,54 @@ public class ARViewUpdater extends ViewUpdater {
 
     }
 
-    /**
-     * Updates TextView that shows the user how many Gems are left to find.
-     * @param numberARGemsNotFound number of ARGems that have not been collected
-     */
-    void updateARGemsNotFound(int numberARGemsNotFound){
-        String text = String.format("%d %s", numberARGemsNotFound, activity.getString(R.string.arGemsLeft));
-        arGemsNotFoundTextView.setText(text);
-    }
 
-    void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
-        if(System.currentTimeMillis() - lastDrawUpdate > DELTA_DRAW_UPDATE) {
-
-            // variables for the point representation
-            final int radius = 30;
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.WHITE);
-            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-            paint.setTextSize(60);
-
-            // Transform the ARPoints coordinates from WGS84 to camera coordinates
-            for (ARGem arGem : arGemLayouts.keySet()) {
-
-                // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
-                float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
-                float[] pointInECEF = CoordinateTransformator.WSG84toECEF(arGem.getLocation());
-                float[] pointInENU = CoordinateTransformator.ECEFtoENU(currentLocation, currentLocationInECEF, pointInECEF);
-
-                // Afterwards we transform the Navigation coordinates (ENU) to Camera coordinates
-                float[] cameraCoordinateVector = new float[4];
-
-                // To convert ENU coordinate to Camera coordinate, we will multiply camera projection matrix
-                // with ENU coordinate vector, the result is a vector [v0, v1, v2, v3].
-                Matrix.multiplyMV(cameraCoordinateVector, 0, rotatedProjectionMatrix, 0, pointInENU, 0);
-
-
-                // cameraCoordinateVector[2] is z, that always less than 0 to display on right position
-                // if z > 0, the point will display on the opposite
-                if (cameraCoordinateVector[2] < 0) {
-
-                    //Then x = (0.5 + v0 / v3) * widthOfCameraView and y = (0.5 - v1 / v3) * heightOfCameraView.
-                    float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
-                    float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
-
-                    // We need to keep track of the position of the ARGems
-                    ARGemLayout gemLayout = this.arGemLayouts.get(arGem);
-                    gemLayout.updatePosition((int)x, (int)y);
-                    gemLayout.layout.requestLayout();
-                    arGem.setX(x);
-                    arGem.setY(y);
-
-                    canvas.drawCircle(x, y, radius, paint);
-                    canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
-                }
-            }
-            lastDrawUpdate = System.currentTimeMillis();
-        }
-    }
+//    void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
+//        if(System.currentTimeMillis() - lastDrawUpdate > DELTA_DRAW_UPDATE) {
+//
+//            // variables for the point representation
+//            final int radius = 30;
+//            paint.setStyle(Paint.Style.FILL);
+//            paint.setColor(Color.WHITE);
+//            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+//            paint.setTextSize(60);
+//
+//            // Transform the ARPoints coordinates from WGS84 to camera coordinates
+//            for (ARGem arGem : arGemLayouts.keySet()) {
+//
+//                // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
+//                float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
+//                float[] pointInECEF = CoordinateTransformator.WSG84toECEF(arGem.getLocation());
+//                float[] pointInENU = CoordinateTransformator.ECEFtoENU(currentLocation, currentLocationInECEF, pointInECEF);
+//
+//                // Afterwards we transform the Navigation coordinates (ENU) to Camera coordinates
+//                float[] cameraCoordinateVector = new float[4];
+//
+//                // To convert ENU coordinate to Camera coordinate, we will multiply camera projection matrix
+//                // with ENU coordinate vector, the result is a vector [v0, v1, v2, v3].
+//                Matrix.multiplyMV(cameraCoordinateVector, 0, rotatedProjectionMatrix, 0, pointInENU, 0);
+//
+//
+//                // cameraCoordinateVector[2] is z, that always less than 0 to display on right position
+//                // if z > 0, the point will display on the opposite
+//                if (cameraCoordinateVector[2] < 0) {
+//
+//                    //Then x = (0.5 + v0 / v3) * widthOfCameraView and y = (0.5 - v1 / v3) * heightOfCameraView.
+//                    float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
+//                    float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
+//
+//                    // We need to keep track of the position of the ARGems
+//                    ARGemLayout gemLayout = this.arGemLayouts.get(arGem);
+//                    gemLayout.updatePosition((int)x, (int)y);
+//                    gemLayout.layout.requestLayout();
+//                    arGem.setX(x);
+//                    arGem.setY(y);
+//
+//                    canvas.drawCircle(x, y, radius, paint);
+//                    canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
+//                }
+//            }
+//            lastDrawUpdate = System.currentTimeMillis();
+//        }
+//    }
 }
 

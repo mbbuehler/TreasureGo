@@ -1,5 +1,7 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -20,8 +23,26 @@ import java.util.Set;
 
 public class AROverlayViewUpdater extends ViewUpdater {
 
+    ARActivity activity;
     long lastDrawUpdate = System.currentTimeMillis();
     long DELTA_DRAW_UPDATE = 1;
+    /**
+     * A Gem is considered as collected when the user touches within this distance (pixels)
+     * around the center of the Gem.
+     */
+    private final double TOUCH_DISTANCE_THRESHOLD = 60;
+    /**
+     * We need access to displayed Toasts such that we can renew the content even when the old
+     * Toast is still showing, so we use an instance variable for Toast.
+     */
+    private Toast toast;
+
+    private TextView arGemsNotFoundTextView;
+
+    /**
+     * Keep track of the time since we started the Quest
+     */
+    private long startTime;
 
     HashMap<ARGem, ARGemLayout> arGemLayouts = new HashMap<>();
 
@@ -45,10 +66,25 @@ public class AROverlayViewUpdater extends ViewUpdater {
         }
     }
 
+
+    /**
+     * Updates TextView that shows the user how many Gems are left to find.
+     * @param numberARGemsNotFound number of ARGems that have not been collected
+     */
+    void updateARGemsNotFound(int numberARGemsNotFound){
+        String text = String.format("%d %s", numberARGemsNotFound, activity.getString(R.string.arGemsLeft));
+        arGemsNotFoundTextView.setText(text);
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
     /**
      * @param activity Activity whose View will be updated
      */
     AROverlayViewUpdater(ARActivity activity, Set<ARGem> arGems) {
+        this.activity = activity;
         arActivityView = activity.findViewById(R.id.activity_ar);
 
         for(ARGem arGem: arGems){
@@ -58,6 +94,9 @@ public class AROverlayViewUpdater extends ViewUpdater {
             arGemLayouts.put(arGem, gemLayout);
             arActivityView.addView(layout, gemLayout.params);
         }
+
+        arGemsNotFoundTextView = activity.findViewById(R.id.arGemsNotFound);
+
     }
 
     void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
@@ -71,7 +110,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
             paint.setTextSize(60);
 
             // Transform the ARPoints coordinates from WGS84 to camera coordinates
-            for (ARGem arGem : arGemLayouts.keySet()) {
+            for (ARGem arGem : activity.getARGems()) {
 
                 // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
                 float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
@@ -107,6 +146,97 @@ public class AROverlayViewUpdater extends ViewUpdater {
             }
             lastDrawUpdate = System.currentTimeMillis();
         }
+    }
+
+    public boolean onTouch(double x, double y){
+        if(activity.getARGems().size() > 0){
+        // Find closest ARGem
+        ARGem closestARGem = findClosestGem(x, y);
+        double closestDistance = closestARGem.euclideanDistanceTo(x, y);
+
+        // If the are close enough to the closest ARGem, then take action.
+        if (closestDistance < TOUCH_DISTANCE_THRESHOLD) {
+            // We can't collect this Gem again.
+            activity.removeARGem(closestARGem);
+            arActivityView.removeView(arGemLayouts.get(closestARGem).layout);
+
+
+            // Inform user about his success.
+            String info = closestARGem.getName() + " " + activity.getString(R.string.collected);
+            showToastInfo(info);
+
+            // Update TextView
+            updateARGemsNotFound(activity.getARGems().size());
+
+            if (activity.getARGems().isEmpty()) {
+                // The user has found all ARGems. We can continue.
+                onAllGemsCollected();
+                return true;
+            }
+        } else {
+            // The user did not catch an ARGem, but touched somewhere else.
+            showToastInfo(R.string.noGemFoundHere);
+        }
+        return true;
+    }
+        return false;
+    }
+
+    /**
+     * The user has collected all gems. This method stores the results and forwards
+     * the user to the TreasureFoundActivity
+     */
+    private void onAllGemsCollected(){
+        // Update the current Quest
+        Quest quest = GameStatus.Instance().getLastQuestForTreasureUuid(activity.targetTreasure.getUuid());
+        quest.setGemCollectionTimeMillis(getDeltaTimeMillis(getStartTime()));
+        quest.setStatus(QuestStatus.COMPLETED);
+
+        // Forward user to the next Activity
+        Intent intent = new Intent(activity, TreasureFoundActivity.class);
+        intent.putExtra(Constant.TREASURE_KEY, activity.targetTreasure.getUuid());
+        activity.startActivity(intent);
+
+    }
+
+    /**
+     * Shows a message to the user.
+     * @param message This String will be shown.
+     */
+    private void showToastInfo(String message){
+        toast.setText(message);
+        toast.show();
+    }
+
+    /**
+     * Shows a message to the user.
+     * @param message Id of R.string that should be displayed.
+     */
+    private void showToastInfo(int message){
+        toast.setText(message);
+        toast.show();
+    }
+
+    /**
+     * Returns the ARGem that is closest to given coordinates x,y.
+     * Time: O(n), n is number of Gems in arGems
+     * @param x coordinate for x-axis
+     * @param y coordinate for y-axis
+     * @return closest ARGem
+     */
+    private ARGem findClosestGem(double x, double y){
+        double closestDistance = 99999999;
+        ARGem closestARGem = null;
+
+        for (ARGem arGem : activity.getARGems()) {
+            double distance = arGem.euclideanDistanceTo(x, y);
+            if (closestARGem == null || distance < closestDistance) {
+                // We found an ARGem that is closer.
+                closestARGem = arGem;
+                closestDistance = distance;
+            }
+        }
+        return closestARGem;
     }
 }
 
