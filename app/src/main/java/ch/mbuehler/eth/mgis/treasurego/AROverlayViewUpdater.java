@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.opengl.Matrix;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -29,7 +30,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
      * A Gem is considered as collected when the user touches within this distance (pixels)
      * around the center of the Gem.
      */
-    private final double TOUCH_DISTANCE_THRESHOLD = 60;
+    private final double TOUCH_DISTANCE_THRESHOLD = 90;
     /**
      * We need access to displayed Toasts such that we can renew the content even when the old
      * Toast is still showing, so we use an instance variable for Toast.
@@ -56,12 +57,13 @@ public class AROverlayViewUpdater extends ViewUpdater {
         public ARGemLayout(RelativeLayout layout) {
             this.layout = layout;
             this.params = new RelativeLayout.LayoutParams(R.dimen.gem_width, R.dimen.gem_height);
+            // Initialization (values do not matter)
             updatePosition(-100,-100);
         }
 
         void updatePosition(int x, int y){
-            this.params.leftMargin = x - 60;
-            this.params.topMargin = y - 60;
+            this.params.leftMargin = x - ((int)activity.getResources().getDimension(R.dimen.gem_width) / 2);
+            this.params.topMargin = y - ((int)activity.getResources().getDimension(R.dimen.gem_width) / 2);
         }
     }
 
@@ -99,17 +101,14 @@ public class AROverlayViewUpdater extends ViewUpdater {
         toast = Toast.makeText(activity, "", Toast.LENGTH_SHORT);
         startTime = System.currentTimeMillis();
 
+        paint.setColor(ContextCompat.getColor(activity, R.color.orange));
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+        paint.setTextSize(activity.getResources().getDimension(R.dimen.text_size));
+
     }
 
     void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
         if(System.currentTimeMillis() - lastDrawUpdate > DELTA_DRAW_UPDATE) {
-
-            // variables for the point representation
-            final int radius = 30;
-            paint.setStyle(Paint.Style.FILL);
-            paint.setColor(Color.WHITE);
-            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-            paint.setTextSize(60);
 
             // Transform the ARPoints coordinates from WGS84 to camera coordinates
             for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
@@ -142,8 +141,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
                     arGem.setX(x);
                     arGem.setY(y);
 
-                    canvas.drawCircle(x, y, radius, paint);
-                    canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
+                    canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 100, paint);
                 }
             }
             lastDrawUpdate = System.currentTimeMillis();
