@@ -1,139 +1,136 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
+import android.app.Activity;
+import android.hardware.Camera;
 import android.location.Location;
 import android.opengl.Matrix;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
-
-import java.util.HashMap;
-import java.util.Set;
+import android.widget.Toast;
 
 /**
- * Created by marcello on 23/04/18.
+ * This class manages View updates for the ARView
  */
+class ARViewUpdater extends ViewUpdater {
 
-public class ARViewUpdater extends ViewUpdater {
     /**
-     * Activity whose View will be updated
+     * Displays the passed time to the user.
      */
-    private ARActivity activity;
-    /**
-     * Keep track of the time since we started the Quest
-     */
-    private long startTime;
-
     private TextView timerTextView;
+
+    //Variables for GUI
+    private SurfaceView surfaceView;
+    private FrameLayout cameraContainerLayout;
+    private AROverlayView arOverlayView;
+
+    private ARCameraView arCamera;
+    private Camera camera;
 
     private TextView tvCurrentLocation;
 
 
-    long lastDrawUpdate = System.currentTimeMillis();
-    long DELTA_DRAW_UPDATE = 1;
-
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-    RelativeLayout arActivityView;
-
-    RelativeLayout.LayoutParams params;
-
-    class ARGemLayout{
-        RelativeLayout layout;
-        RelativeLayout.LayoutParams params;
-
-        public ARGemLayout(RelativeLayout layout) {
-            this.layout = layout;
-            this.params = new RelativeLayout.LayoutParams(R.dimen.gem_width, R.dimen.gem_height);
-            updatePosition(-100,-100);
-        }
-
-        void updatePosition(int x, int y){
-            this.params.leftMargin = x - 60;
-            this.params.topMargin = y - 60;
-        }
-    }
-
-    /**
-     * @param activity Activity whose View will be updated
-     */
     ARViewUpdater(ARActivity activity) {
-        this.activity = activity;
-
-        // We keep track of when we started
-        this.startTime = System.currentTimeMillis();
-
         timerTextView = activity.findViewById(R.id.timePassedValue);
         tvCurrentLocation = activity.findViewById(R.id.tv_current_location);
+
+        // Bind Views
+        cameraContainerLayout = activity.findViewById(R.id.camera_container_layout);
+        surfaceView = activity.findViewById(R.id.surface_view);
+        arOverlayView = new AROverlayView(activity, new AROverlayViewUpdater(activity));
+        // This listener handles onTouchEvents, e.g. collecting ARGems
+        arOverlayView.setOnTouchListener(arOverlayView.getOnTouchListener());
+
+
     }
 
     /**
      * Updates the field for time
      */
     void updateTime() {
-        String formattedTimeDifference = this.getFormattedTimeDifference(getDeltaTimeMillis(startTime));
+        String formattedTimeDifference = this.getFormattedTimeDifference(getDeltaTimeMillis(ARGameStatus.Instance().getStartTime()));
         timerTextView.setText(formattedTimeDifference);
     }
 
-    void updateTVCurrentLocation(Location location){
-
-    tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
-            location.getLatitude(), location.getLongitude(), location.getAltitude()));
+    void updateTVCurrentLocation(Location location) {
+        tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
+                location.getLatitude(), location.getLongitude(), location.getAltitude()));
 
     }
 
+    /**
+     * Initialize the GUI elements to draw the AR Points
+     */
+    public void initAROverlayView() {
 
-//    void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
-//        if(System.currentTimeMillis() - lastDrawUpdate > DELTA_DRAW_UPDATE) {
-//
-//            // variables for the point representation
-//            final int radius = 30;
-//            paint.setStyle(Paint.Style.FILL);
-//            paint.setColor(Color.WHITE);
-//            paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-//            paint.setTextSize(60);
-//
-//            // Transform the ARPoints coordinates from WGS84 to camera coordinates
-//            for (ARGem arGem : arGemLayouts.keySet()) {
-//
-//                // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
-//                float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
-//                float[] pointInECEF = CoordinateTransformator.WSG84toECEF(arGem.getLocation());
-//                float[] pointInENU = CoordinateTransformator.ECEFtoENU(currentLocation, currentLocationInECEF, pointInECEF);
-//
-//                // Afterwards we transform the Navigation coordinates (ENU) to Camera coordinates
-//                float[] cameraCoordinateVector = new float[4];
-//
-//                // To convert ENU coordinate to Camera coordinate, we will multiply camera projection matrix
-//                // with ENU coordinate vector, the result is a vector [v0, v1, v2, v3].
-//                Matrix.multiplyMV(cameraCoordinateVector, 0, rotatedProjectionMatrix, 0, pointInENU, 0);
-//
-//
-//                // cameraCoordinateVector[2] is z, that always less than 0 to display on right position
-//                // if z > 0, the point will display on the opposite
-//                if (cameraCoordinateVector[2] < 0) {
-//
-//                    //Then x = (0.5 + v0 / v3) * widthOfCameraView and y = (0.5 - v1 / v3) * heightOfCameraView.
-//                    float x = (0.5f + cameraCoordinateVector[0] / cameraCoordinateVector[3]) * canvas.getWidth();
-//                    float y = (0.5f - cameraCoordinateVector[1] / cameraCoordinateVector[3]) * canvas.getHeight();
-//
-//                    // We need to keep track of the position of the ARGems
-//                    ARGemLayout gemLayout = this.arGemLayouts.get(arGem);
-//                    gemLayout.updatePosition((int)x, (int)y);
-//                    gemLayout.layout.requestLayout();
-//                    arGem.setX(x);
-//                    arGem.setY(y);
-//
-//                    canvas.drawCircle(x, y, radius, paint);
-//                    canvas.drawText(arGem.getName(), x - (30 * arGem.getName().length() / 2), y - 80, paint);
-//                }
-//            }
-//            lastDrawUpdate = System.currentTimeMillis();
-//        }
-//    }
+        if (arOverlayView.getParent() != null) {
+            ((ViewGroup) arOverlayView.getParent()).removeView(arOverlayView);
+        }
+        cameraContainerLayout.addView(arOverlayView);
+    }
+
+    /**
+     * Initiliaze the GUI elements and the camera View
+     */
+    public void initARCameraView(Activity activity) {
+
+        if (surfaceView.getParent() != null) {
+            ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
+        }
+
+        cameraContainerLayout.addView(surfaceView);
+
+        if (arCamera == null) {
+            arCamera = new ARCameraView(activity, surfaceView);
+        }
+        if (arCamera.getParent() != null) {
+            ((ViewGroup) arCamera.getParent()).removeView(arCamera);
+        }
+        cameraContainerLayout.addView(arCamera);
+        arCamera.setKeepScreenOn(true);
+
+        //initCamera
+        int numCams = Camera.getNumberOfCameras();
+        if (numCams > 0) {
+            try {
+                camera = Camera.open();
+                camera.startPreview();
+                arCamera.setCamera(camera);
+            } catch (RuntimeException ex) {
+                Toast.makeText(activity, R.string.cameraNotFound, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    void onPause(){
+        if (camera != null) {
+            camera.setPreviewCallback(null);
+            camera.stopPreview();
+            arCamera.setCamera(null);
+            camera.release();
+            camera = null;
+        }
+    }
+
+    void onSensorChanged(float[] projectionMatrix, float[] rotatedProjectionMatrix, float[] rotationMatrixFromVector){
+        if (arCamera != null) {
+            projectionMatrix = arCamera.getProjectionMatrix();
+        }
+
+        Matrix.multiplyMM(rotatedProjectionMatrix, 0, projectionMatrix, 0, rotationMatrixFromVector, 0);
+        arOverlayView.updateRotatedProjectionMatrix(rotatedProjectionMatrix);
+
+    }
+
+    void onLocationChanged(Location location){
+        if (arOverlayView != null) {
+            arOverlayView.updateCurrentLocation(location);
+            updateTVCurrentLocation(location);
+            updateTime();
+        }
+    }
+
+
 }
 

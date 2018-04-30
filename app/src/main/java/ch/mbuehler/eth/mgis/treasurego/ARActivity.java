@@ -2,7 +2,6 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,51 +9,38 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.SurfaceView;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import java.util.HashMap;
-import java.util.Set;
 
 
 public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
 
-    //Variables for GUI
-    private SurfaceView surfaceView;
-    private FrameLayout cameraContainerLayout;
-    private AROverlayView arView;
-    private Camera camera;
-    private ARCameraView arCamera;
     /**
      * Responsible for updating the View elements, e.g. distance, time, etc.
      */
-    ARViewUpdater viewUpdater;
+    ARViewUpdater arViewUpdater;
 
-    // variables for camera
+    // Managers
     private SensorManager sensorManager;
+    private LocationManager locationManager;
+
+    // Permissions
     private final static int REQUEST_CAMERA_PERMISSIONS_CODE = 11;
 
-    // variables for location manager
+    // variables for location management
     public static final int REQUEST_LOCATION_PERMISSIONS_CODE = 0;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
     private static final long MIN_TIME_BW_UPDATES = 0;
-
-    private LocationManager locationManager;
     boolean isGPSEnabled;
 
-
-
     /**
-     * Called when the activity is starting. Here we create the layout and initialize the arView, cameraContainerLayout and the TextView with the current location.
+     * Called when the activity is starting. Here we create the layout and initialize the arOverlayView, cameraContainerLayout and the TextView with the current location.
      *
      * @param savedInstanceState If the activity is being re-initialized after previously being shut down then this Bundle contains the data it most recently supplied in onSaveInstanceState(Bundle).
      */
@@ -64,26 +50,37 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         setContentView(R.layout.activity_aractivity);
 
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
-        cameraContainerLayout = findViewById(R.id.camera_container_layout);
-        surfaceView = findViewById(R.id.surface_view);
 
+        Treasure targetTreasure = initTargetTreasure();
+        initARGems(targetTreasure.getLocation());
+
+        arViewUpdater = new ARViewUpdater(this);
+    }
+
+    /**
+     * Initializes the target Treasure with data from Intent
+     *
+     * @return instance of Treasure
+     */
+    private Treasure initTargetTreasure() {
         // Obtain target Treasure from Intent and save it
-        Treasure targetTreasure  =Treasure.unserializeTreasureFromIntent(getIntent());
+        Treasure targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
         ARGameStatus.Instance().setTargetTreasure(targetTreasure);
+        return targetTreasure;
+    }
 
-        // Current altitude of user
+    /**
+     * Initializes ARGems around a given Location
+     *
+     * @param location center around which we will place the ARGems
+     */
+    private void initARGems(Location location) {
+        // Current altitude of user (needed to set altitude of ARGems)
         int currentAltitude = Integer.parseInt(getIntent().getStringExtra(Constant.ALTITUDE_KEY));
         // Create the ARGems that the user is supposed to collect
-        HashMap<ARGem, Boolean> arGems = new ARGemFactory().initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
+        HashMap<ARGem, Boolean> arGems = new ARGemFactory().initializeRandomARGems(5, location, 0.05, 0.15, currentAltitude);
         // Save it such that other classes can access
         ARGameStatus.Instance().setArGems(arGems);
-
-
-        viewUpdater = new ARViewUpdater(this);
-
-        arView = new AROverlayView(this, new AROverlayViewUpdater(this));
-        // This listener handles onTouchEvents, e.g. collecting ARGems
-        arView.setOnTouchListener(arView.getOnTouchListener());
     }
 
     /**
@@ -107,15 +104,14 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                 this.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             this.requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSIONS_CODE);
         } else {
-            initARCameraView();
+            arViewUpdater.initARCameraView(this);
         }
 
         // register rotational sensnor
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
                 SensorManager.SENSOR_DELAY_FASTEST);
-
-        initAROverlayView();
+        arViewUpdater.initAROverlayView();
     }
 
     /**
@@ -134,14 +130,8 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         // Unregister all sensors
         sensorManager.unregisterListener(this);
 
-
-        if (camera != null) {
-            camera.setPreviewCallback(null);
-            camera.stopPreview();
-            arCamera.setCamera(null);
-            camera.release();
-            camera = null;
-        }
+        // Propagate onPause Event to viewUpdater
+        arViewUpdater.onPause();
 
         super.onPause();
     }
@@ -156,16 +146,12 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-
             // This function is called when "dangerous" permissions are requested.
             case REQUEST_LOCATION_PERMISSIONS_CODE: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     initLocationService();
-
                 } else {
-
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                 }
@@ -176,7 +162,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    initARCameraView();
+                    arViewUpdater.initARCameraView(this);
 
                 } else {
                     // permission denied, boo! Disable the
@@ -188,59 +174,13 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     }
 
     /**
-     * Initialize the GUI elements to draw the AR Points
-     */
-    public void initAROverlayView() {
-
-        if (arView.getParent() != null) {
-            ((ViewGroup) arView.getParent()).removeView(arView);
-        }
-        cameraContainerLayout.addView(arView);
-    }
-
-    /**
-     * Initiliaze the GUI elements and the camera View
-     */
-    public void initARCameraView() {
-
-        if (surfaceView.getParent() != null) {
-            ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
-        }
-
-        cameraContainerLayout.addView(surfaceView);
-
-        if (arCamera == null) {
-            arCamera = new ARCameraView(this, surfaceView);
-        }
-        if (arCamera.getParent() != null) {
-            ((ViewGroup) arCamera.getParent()).removeView(arCamera);
-        }
-        cameraContainerLayout.addView(arCamera);
-        arCamera.setKeepScreenOn(true);
-
-        //initCamera
-        int numCams = Camera.getNumberOfCameras();
-        if (numCams > 0) {
-            try {
-                camera = Camera.open();
-                camera.startPreview();
-                arCamera.setCamera(camera);
-            } catch (RuntimeException ex) {
-                Toast.makeText(this, R.string.cameraNotFound, Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * Initiliaze the LocationService
+     * Initialize the LocationService
      */
     private void initLocationService() {
-
         if (Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         try {
             locationManager = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
 
@@ -254,7 +194,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
             }
         } catch (Exception ex) {
             Log.e("MainActivity", ex.getMessage());
-
         }
     }
 
@@ -265,21 +204,12 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
      */
     @Override
     public void onSensorChanged(SensorEvent event) {
-
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-
             float[] rotationMatrixFromVector = new float[16];
             float[] projectionMatrix = new float[16];
             float[] rotatedProjectionMatrix = new float[16];
-
             SensorManager.getRotationMatrixFromVector(rotationMatrixFromVector, event.values);
-
-            if (arCamera != null) {
-                projectionMatrix = arCamera.getProjectionMatrix();
-            }
-
-            Matrix.multiplyMM(rotatedProjectionMatrix, 0, projectionMatrix, 0, rotationMatrixFromVector, 0);
-            this.arView.updateRotatedProjectionMatrix(rotatedProjectionMatrix);
+            arViewUpdater.onSensorChanged(projectionMatrix, rotatedProjectionMatrix, rotationMatrixFromVector);
         }
     }
 
@@ -302,11 +232,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
      */
     @Override
     public void onLocationChanged(Location location) {
-        if (arView != null) {
-            arView.updateCurrentLocation(location);
-            viewUpdater.updateTVCurrentLocation(location);
-            viewUpdater.updateTime();
-        }
+        arViewUpdater.onLocationChanged(location);
     }
 
     /**
