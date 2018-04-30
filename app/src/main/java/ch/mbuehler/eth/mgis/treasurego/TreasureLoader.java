@@ -3,6 +3,7 @@ package ch.mbuehler.eth.mgis.treasurego;
 import android.content.Context;
 import android.location.Location;
 import android.os.Environment;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,7 +74,7 @@ class TreasureLoader {
             }
         } catch (IOException e) {
             // There was a problem when reading the file
-            e.printStackTrace();
+            Toast.makeText(context, R.string.csvCouldNotBeLoaded, Toast.LENGTH_SHORT).show();
         }
         return treasures;
     }
