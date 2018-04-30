@@ -1,5 +1,7 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
+import android.util.Log;
+
 /**
  * Calculates the reward for a particular game situation. The calculated reward depends on the average speed and the current temperature.
  */
@@ -9,7 +11,7 @@ class RewardCalculator {
     /**
      * In milliseconds
      */
-    private final static float[] TIME_RANGE = new float[]{0, 60 * 1000};
+    private final static float[] TIME_RANGE = new float[]{30 * 1000, 60 * 1000};
 
     /**
      * Calculates the reward for the given combination of variables.
@@ -36,7 +38,7 @@ class RewardCalculator {
         int restReward = maxReward - minReward;
 
         // If the user was fast he can get additional points.
-        double preciseReward = minReward + restReward * normalizedCollectionTime;
+        double preciseReward = minReward + restReward * (1 - normalizedCollectionTime);
 
         // Reward is measured in coins, so we need an int.
         return (int) Math.round(preciseReward);
@@ -64,9 +66,12 @@ class RewardCalculator {
      */
     private static double normalizeValue(double value, double min, double max) {
         double valueInRange = Math.max(value, min);
-        valueInRange = Math.min(value, max);
+        valueInRange = Math.min(valueInRange, max);
 
-        double normalizedValue = valueInRange / max;
+        double delta = max - min;
+
+        double normalizedValue = (valueInRange - min)/ delta;
+        Log.v("NORM", String.format("%f, %f, %f, %f", value, min, max, normalizedValue));
         return normalizedValue;
     }
 
