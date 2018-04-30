@@ -1,9 +1,5 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.content.Context;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -11,36 +7,41 @@ import java.util.Set;
  * the ARActivity can access variables via this class.
  */
 public class ARGameStatus {
-        /**
-         * Singleton instance
-         */
-        private static ch.mbuehler.eth.mgis.treasurego.ARGameStatus instance;
+    /**
+     * Singleton instance
+     */
+    private static ch.mbuehler.eth.mgis.treasurego.ARGameStatus instance;
 
-
-    Treasure targetTreasure;
-    HashMap<ARGem, Boolean> arGems;
+    /**
+     * Treasure the user is searching for.
+     */
+    private Treasure targetTreasure;
+    /**
+     * This variable holds all ARGems the user has left to collect.
+     */
+    private Set<ARGem> arGems;
     /**
      * Keep track of the time since we started the Quest (needed for calculating reward)
      */
     private long startTime;
 
 
-        /**
-         * Returns the unique instance of GameStatus
-         * Synchronized is needed to make this method thread safe
-         *
-         * @return
-         */
-        static synchronized ch.mbuehler.eth.mgis.treasurego.ARGameStatus Instance() {
-            if (instance == null) {
-                instance = new ch.mbuehler.eth.mgis.treasurego.ARGameStatus();
-            }
-            return instance;
+    /**
+     * Returns the unique instance of GameStatus
+     * Synchronized is needed to make this method thread safe
+     *
+     * @return
+     */
+    static synchronized ch.mbuehler.eth.mgis.treasurego.ARGameStatus Instance() {
+        if (instance == null) {
+            instance = new ch.mbuehler.eth.mgis.treasurego.ARGameStatus();
         }
+        return instance;
+    }
 
-        ARGameStatus(){
-            startTime = System.currentTimeMillis();
-        }
+    ARGameStatus() {
+        startTime = System.currentTimeMillis();
+    }
 
     public Treasure getTargetTreasure() {
         return targetTreasure;
@@ -50,19 +51,19 @@ public class ARGameStatus {
         this.targetTreasure = targetTreasure;
     }
 
-    public Set<ARGem> getARGemsSet(){
-            return arGems.keySet();
-    }
-
-    public void removeARGem(ARGem arGem){
-        arGems.remove(arGem);
-    }
-
-    public HashMap<ARGem, Boolean> getArGems() {
+    public Set<ARGem> getARGems() {
         return arGems;
     }
 
-    public void setArGems(HashMap<ARGem, Boolean> arGems) {
+    /**
+     * Removes the given arGem to found such that it won't be displayed any more.
+     * @param arGem
+     */
+    public void removeARGem(ARGem arGem) {
+        arGems.remove(arGem);
+    }
+
+    public void setArGems(Set<ARGem> arGems) {
         this.arGems = arGems;
     }
 

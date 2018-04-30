@@ -77,13 +77,16 @@ class AROverlayViewUpdater extends ViewUpdater {
 
         initARGems();
         initPaint();
+
+        // Initialize info view
+        updateARGemsNotFound(ARGameStatus.Instance().getARGems().size());
     }
 
     /**
      * Creates and saves the Layout for the ARGems
      */
     private void initARGems() {
-        for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
+        for (ARGem arGem : ARGameStatus.Instance().getARGems()) {
             RelativeLayout layout = (RelativeLayout) View.inflate(activity, R.layout.image_gemview, null);
             ARGemLayout gemLayout = new ARGemLayout(layout);
             ((ImageView) gemLayout.layout.findViewById(R.id.image_gem)).setImageResource(arGem.getImageId());
@@ -113,7 +116,7 @@ class AROverlayViewUpdater extends ViewUpdater {
     void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix) {
 
         // Transform the ARPoints coordinates from WGS84 to camera coordinates
-        for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
+        for (ARGem arGem : ARGameStatus.Instance().getARGems()) {
 
             // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
             float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
@@ -168,7 +171,7 @@ class AROverlayViewUpdater extends ViewUpdater {
      */
     void onTouch(double x, double y) {
         // Only perform action if we are not done yet
-        if (ARGameStatus.Instance().getARGemsSet().size() > 0) {
+        if (ARGameStatus.Instance().getARGems().size() > 0) {
             // Find closest ARGem
             ARGem closestARGem = findClosestGem(x, y);
             double closestDistance = closestARGem.euclideanDistanceTo(x, y);
@@ -184,9 +187,9 @@ class AROverlayViewUpdater extends ViewUpdater {
                 showToastInfo(info);
 
                 // Update TextView
-                updateARGemsNotFound(ARGameStatus.Instance().getARGemsSet().size());
+                updateARGemsNotFound(ARGameStatus.Instance().getARGems().size());
 
-                if (ARGameStatus.Instance().getARGemsSet().isEmpty()) {
+                if (ARGameStatus.Instance().getARGems().isEmpty()) {
                     // The user has found all ARGems. We can continue.
                     onAllGemsCollected();
                 }
@@ -247,7 +250,7 @@ class AROverlayViewUpdater extends ViewUpdater {
         double closestDistance = 99999999;
         ARGem closestARGem = null;
 
-        for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
+        for (ARGem arGem : ARGameStatus.Instance().getARGems()) {
             double distance = arGem.euclideanDistanceTo(x, y);
             if (closestARGem == null || distance < closestDistance) {
                 // We found an ARGem that is closer.

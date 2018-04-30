@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.Set;
 
 
 public class ARActivity extends AppCompatActivity implements SensorEventListener, LocationListener {
@@ -51,6 +52,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
 
         sensorManager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
 
+        // Initialize targetTreasure and ARGems
         Treasure targetTreasure = initTargetTreasure();
         initARGems(targetTreasure.getLocation());
 
@@ -78,7 +80,7 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         // Current altitude of user (needed to set altitude of ARGems)
         int currentAltitude = Integer.parseInt(getIntent().getStringExtra(Constant.ALTITUDE_KEY));
         // Create the ARGems that the user is supposed to collect
-        HashMap<ARGem, Boolean> arGems = new ARGemFactory().initializeRandomARGems(5, location, 0.05, 0.15, currentAltitude);
+        Set<ARGem> arGems = new ARGemFactory().initializeRandomARGems(5, location, 0.05, 0.15, currentAltitude);
         // Save it such that other classes can access
         ARGameStatus.Instance().setArGems(arGems);
     }
