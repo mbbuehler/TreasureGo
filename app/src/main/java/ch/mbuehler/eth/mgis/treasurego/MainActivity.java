@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         askAgainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                System.exit(0);
+                finish();
             }
         }, 3000);
     }
