@@ -7,7 +7,7 @@ import android.widget.TextView;
 /**
  * This class handles View updates for the CompassActivity
  */
-class CompassViewUpdater extends ViewUpdater{
+class CompassViewUpdater extends ViewUpdater {
 
     /**
      * Activity whose View will be updated

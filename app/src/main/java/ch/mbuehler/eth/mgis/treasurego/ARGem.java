@@ -15,7 +15,7 @@ public class ARGem {
     /**
      * An ARGem represent a point in the 3D space for the AROverlayView.
      *
-     * @param name     the name of the ARGem
+     * @param name the name of the ARGem
      */
     ARGem(String name, Location location, int imageId) {
         this.name = name;
@@ -41,12 +41,12 @@ public class ARGem {
         return name;
     }
 
-    double euclideanDistanceTo(double x, double y){
+    double euclideanDistanceTo(double x, double y) {
         return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
     }
 
-    public String toString(){
-        return String.format("ARGem(%f,%f)",x,y);
+    public String toString() {
+        return String.format("ARGem(%f,%f)", x, y);
     }
 
     void setX(double x) {

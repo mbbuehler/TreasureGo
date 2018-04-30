@@ -6,7 +6,7 @@ import android.widget.RelativeLayout;
 /**
  * Holds the layout for one ARGem
  */
-class ARGemLayout{
+class ARGemLayout {
     RelativeLayout layout;
     RelativeLayout.LayoutParams params;
 
@@ -21,12 +21,13 @@ class ARGemLayout{
 
     /**
      * Updates the position of the current ARGem. x, y are the new center coordinates.
-     * @param x px
-     * @param y px
+     *
+     * @param x        px
+     * @param y        px
      * @param activity Context for querying resources
      */
-    void updatePosition(int x, int y, Activity activity){
-        this.params.leftMargin = x - ((int)activity.getResources().getDimension(R.dimen.gem_width) / 2);
-        this.params.topMargin = y - ((int)activity.getResources().getDimension(R.dimen.gem_width) / 2);
+    void updatePosition(int x, int y, Activity activity) {
+        this.params.leftMargin = x - ((int) activity.getResources().getDimension(R.dimen.gem_width) / 2);
+        this.params.topMargin = y - ((int) activity.getResources().getDimension(R.dimen.gem_width) / 2);
     }
 }

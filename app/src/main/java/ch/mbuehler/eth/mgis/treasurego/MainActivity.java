@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,8 +41,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // If call onCreate with this extra, this means we have to close the app.
-        if (getIntent().getBooleanExtra("LOGOUT", false))
-        {
+        if (getIntent().getBooleanExtra("LOGOUT", false)) {
             finish();
         }
 

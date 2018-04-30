@@ -335,8 +335,8 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             // it via the altitude of position from where the AR View is launched.
             String currentAltitudeString;
             try {
-                currentAltitudeString = Integer.toString((int)getCurrentLocation().getAltitude());
-            } catch(LocationNotFoundException e){
+                currentAltitudeString = Integer.toString((int) getCurrentLocation().getAltitude());
+            } catch (LocationNotFoundException e) {
                 // use a default altitude
                 currentAltitudeString = "0";
             }

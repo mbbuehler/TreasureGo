@@ -18,12 +18,12 @@ class RewardCalculator {
      * The reward is calculated as a linear combination of the averageSpeed and currentTemperature.
      * Returns the reward as number of coins (int): 0 <= reward <= maxReward
      *
-     * @param treasure           Treasure
+     * @param treasure                Treasure
      * @param gemCollectionTimeMillis in milliseconds
      * @return int
      */
     static int calculateReward(Treasure treasure, double gemCollectionTimeMillis) {
-        if(gemCollectionTimeMillis < 0){
+        if (gemCollectionTimeMillis < 0) {
             // Variable has not been set.
             return 0;
         }
@@ -34,7 +34,7 @@ class RewardCalculator {
         // maximum achievable reward for this treasure
         int maxReward = treasure.getReward();
         // The user receives at least some coins
-        int minReward = (int)((float)maxReward / 2);
+        int minReward = (int) ((float) maxReward / 2);
         int restReward = maxReward - minReward;
 
         // If the user was fast he can get additional points.
@@ -70,7 +70,7 @@ class RewardCalculator {
 
         double delta = max - min;
 
-        double normalizedValue = (valueInRange - min)/ delta;
+        double normalizedValue = (valueInRange - min) / delta;
         Log.v("NORM", String.format("%f, %f, %f, %f", value, min, max, normalizedValue));
         return normalizedValue;
     }

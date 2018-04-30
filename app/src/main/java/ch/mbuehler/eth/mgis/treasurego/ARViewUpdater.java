@@ -28,7 +28,6 @@ class ARViewUpdater extends ViewUpdater {
     private Camera camera;
 
     /**
-     *
      * @param activity Activity
      */
     ARViewUpdater(ARActivity activity) {
@@ -92,7 +91,7 @@ class ARViewUpdater extends ViewUpdater {
         }
     }
 
-    void onPause(){
+    void onPause() {
         // We disable the camera to save battery.
         if (camera != null) {
             camera.setPreviewCallback(null);
@@ -103,7 +102,7 @@ class ARViewUpdater extends ViewUpdater {
         }
     }
 
-    void onSensorChanged(float[] projectionMatrix, float[] rotatedProjectionMatrix, float[] rotationMatrixFromVector){
+    void onSensorChanged(float[] projectionMatrix, float[] rotatedProjectionMatrix, float[] rotationMatrixFromVector) {
         if (arCamera != null) {
             projectionMatrix = arCamera.getProjectionMatrix();
         }
@@ -115,7 +114,7 @@ class ARViewUpdater extends ViewUpdater {
         updateTime();
     }
 
-    void onLocationChanged(Location location){
+    void onLocationChanged(Location location) {
         if (arOverlayView != null) {
             arOverlayView.updateCurrentLocation(location);
         }

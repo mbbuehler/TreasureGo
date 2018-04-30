@@ -57,6 +57,7 @@ class ARGameStatus {
 
     /**
      * Removes the given arGem to found such that it won't be displayed any more.
+     *
      * @param arGem ARGem to remove
      */
     void removeARGem(ARGem arGem) {
@@ -75,7 +76,7 @@ class ARGameStatus {
      * Resets startTime.
      * Call this method whenever the user starts to search for ARGems.
      */
-    void resetTime(){
+    void resetTime() {
         startTime = System.currentTimeMillis();
     }
 }

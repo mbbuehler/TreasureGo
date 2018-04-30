@@ -22,8 +22,8 @@ public class Quest {
     private double gemCollectionTimeMillis = -1;
 
     /**
-     * @param treasure    Target Treasure
-     * @param status      COMPLETED
+     * @param treasure Target Treasure
+     * @param status   COMPLETED
      */
     public Quest(Treasure treasure, QuestStatus status) {
         this.treasure = treasure;
@@ -56,7 +56,7 @@ public class Quest {
 
 
     public double getGemCollectionTimeMillis() {
-        if(gemCollectionTimeMillis > 0){
+        if (gemCollectionTimeMillis > 0) {
             return gemCollectionTimeMillis;
         }
         return -1;

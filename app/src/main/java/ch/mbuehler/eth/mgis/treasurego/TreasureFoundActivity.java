@@ -47,7 +47,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
         treasureNameView.setText(treasureNameText);
 
         TextView arGemCollectionTimeTextView = findViewById(R.id.arGemCollectionTimeValue);
-        String gemCollectionTimeText = Formatter.formatDouble(completedQuest.getGemCollectionTimeMillis()/1000, 1) + getString(R.string.timeUnitSeconds);
+        String gemCollectionTimeText = Formatter.formatDouble(completedQuest.getGemCollectionTimeMillis() / 1000, 1) + getString(R.string.timeUnitSeconds);
         arGemCollectionTimeTextView.setText(gemCollectionTimeText);
     }
 
