@@ -59,7 +59,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
      */
     public void closeApp(View view) {
         Toast.makeText(this, R.string.thanksBye, Toast.LENGTH_SHORT);
-        System.exit(0);
+        finish();
     }
 
     /**
