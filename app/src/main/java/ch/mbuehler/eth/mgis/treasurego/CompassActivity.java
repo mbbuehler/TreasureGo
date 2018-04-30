@@ -343,6 +343,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             intent.putExtra(Constant.ALTITUDE_KEY, currentAltitudeString);
 
             startActivity(intent);
+            this.finish();
         }
     }
 

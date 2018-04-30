@@ -56,8 +56,6 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
             double x = motionEvent.getX();
             double y = motionEvent.getY();
 
-            Log.v("XY", String.format("%d,%d",(int)x, (int)y));
-
             viewUpdater.onTouch(x, y);
 
         }

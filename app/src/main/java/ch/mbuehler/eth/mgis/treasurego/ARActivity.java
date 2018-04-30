@@ -57,6 +57,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         initARGems(targetTreasure.getLocation());
 
         arViewUpdater = new ARViewUpdater(this);
+
+        // Start measuring the time the user needs to find the ARGems
+        ARGameStatus.Instance().resetTime();
     }
 
     /**

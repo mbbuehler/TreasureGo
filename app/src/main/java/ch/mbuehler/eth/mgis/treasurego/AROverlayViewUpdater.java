@@ -215,6 +215,7 @@ class AROverlayViewUpdater extends ViewUpdater {
         Intent intent = new Intent(activity, TreasureFoundActivity.class);
         intent.putExtra(Constant.TREASURE_KEY, targetTreasureUUID);
         activity.startActivity(intent);
+        activity.finish();
     }
 
     /**

@@ -59,6 +59,13 @@ public class TreasureFoundActivity extends AppCompatActivity {
      */
     public void closeApp(View view) {
         Toast.makeText(this, R.string.thanksBye, Toast.LENGTH_SHORT);
+        // Solution to close app from Stackoverlow:
+        // https://stackoverflow.com/questions/2092951/how-to-close-android-application
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("LOGOUT", true);
+        startActivity(intent);
+
         finish();
     }
 

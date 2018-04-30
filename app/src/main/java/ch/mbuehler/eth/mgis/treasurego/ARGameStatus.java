@@ -70,4 +70,12 @@ public class ARGameStatus {
     public long getStartTime() {
         return startTime;
     }
+
+    /**
+     * Resets startTime.
+     * Call this method whenever the user starts to search for ARGems.
+     */
+    public void resetTime(){
+        startTime = System.currentTimeMillis();
+    }
 }

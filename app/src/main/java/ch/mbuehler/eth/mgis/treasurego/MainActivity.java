@@ -41,6 +41,12 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // If call onCreate with this extra, this means we have to close the app.
+        if (getIntent().getBooleanExtra("LOGOUT", false))
+        {
+            finish();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permissionChecker = new PermissionChecker(this);
@@ -168,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
      * @return AdapterView.OnItemClickListener
      */
     public AdapterView.OnItemClickListener getOnTreasureSelectedListener() {
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+        return new AdapterView.OnItemClickListener() {
             // This Listener is called when the user selects a Treasure from the list.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // If we do not check here, we might end up
@@ -189,6 +195,5 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                 }
             }
         };
-        return listener;
     }
 }
