@@ -1,20 +1,17 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.widget.TextView;
-
 /**
- * Created by marcello on 23/04/18.
+ * Abstract base class for classes that update Views.
  */
+abstract class ViewUpdater {
 
-public abstract class ViewUpdater {
 
-
-    long getDeltaTimeMillis(long startTime){
+    long getDeltaTimeMillis(long startTime) {
         long deltaTimeMillis = System.currentTimeMillis() - startTime;
         return deltaTimeMillis;
     }
 
-    protected String getFormattedTimeDifference(long deltaTimeMillis){
+    protected String getFormattedTimeDifference(long deltaTimeMillis) {
         int seconds = (int) (deltaTimeMillis / 1000);
         int minutes = seconds / 60;
         int hours = minutes / 60;

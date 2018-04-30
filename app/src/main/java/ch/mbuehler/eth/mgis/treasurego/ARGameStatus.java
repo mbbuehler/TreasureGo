@@ -6,7 +6,7 @@ import java.util.Set;
  * Singleton holding the current status for ARActivity. All views and listeners associated with
  * the ARActivity can access variables via this class.
  */
-public class ARGameStatus {
+class ARGameStatus {
     /**
      * Singleton instance
      */
@@ -30,7 +30,7 @@ public class ARGameStatus {
      * Returns the unique instance of GameStatus
      * Synchronized is needed to make this method thread safe
      *
-     * @return
+     * @return Singleton instance of ARGameStatus
      */
     static synchronized ch.mbuehler.eth.mgis.treasurego.ARGameStatus Instance() {
         if (instance == null) {
@@ -39,35 +39,35 @@ public class ARGameStatus {
         return instance;
     }
 
-    ARGameStatus() {
+    private ARGameStatus() {
         startTime = System.currentTimeMillis();
     }
 
-    public Treasure getTargetTreasure() {
+    Treasure getTargetTreasure() {
         return targetTreasure;
     }
 
-    public void setTargetTreasure(Treasure targetTreasure) {
+    void setTargetTreasure(Treasure targetTreasure) {
         this.targetTreasure = targetTreasure;
     }
 
-    public Set<ARGem> getARGems() {
+    Set<ARGem> getARGems() {
         return arGems;
     }
 
     /**
      * Removes the given arGem to found such that it won't be displayed any more.
-     * @param arGem
+     * @param arGem ARGem to remove
      */
-    public void removeARGem(ARGem arGem) {
+    void removeARGem(ARGem arGem) {
         arGems.remove(arGem);
     }
 
-    public void setArGems(Set<ARGem> arGems) {
+    void setArGems(Set<ARGem> arGems) {
         this.arGems = arGems;
     }
 
-    public long getStartTime() {
+    long getStartTime() {
         return startTime;
     }
 
@@ -75,7 +75,7 @@ public class ARGameStatus {
      * Resets startTime.
      * Call this method whenever the user starts to search for ARGems.
      */
-    public void resetTime(){
+    void resetTime(){
         startTime = System.currentTimeMillis();
     }
 }

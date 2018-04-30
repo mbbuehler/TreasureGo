@@ -10,7 +10,7 @@ class ARGemLayout{
     RelativeLayout layout;
     RelativeLayout.LayoutParams params;
 
-    public ARGemLayout(RelativeLayout layout) {
+    ARGemLayout(RelativeLayout layout) {
         this.layout = layout;
         this.params = new RelativeLayout.LayoutParams(R.dimen.gem_width, R.dimen.gem_height);
         // Initialize margins with large negative values in order to hide them. After the first

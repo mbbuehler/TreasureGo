@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Singleton holding the current game status.
  */
-public class GameStatus {
+class GameStatus {
 
     /**
      * Singleton instance
@@ -45,7 +45,7 @@ public class GameStatus {
      * Returns the unique instance of GameStatus
      * Synchronized is needed to make this method thread safe
      *
-     * @return
+     * @return instance of this Singleton
      */
     static synchronized GameStatus Instance() {
         if (instance == null) {
@@ -68,21 +68,12 @@ public class GameStatus {
         Instance().treasureQuests = new HashMap<>();
     }
 
-    public ArrayList<Treasure> getAllTreasures() {
+    ArrayList<Treasure> getAllTreasures() {
         return Instance().allTreasures;
     }
 
-    public void setAllTreasures(ArrayList<Treasure> allTreasures) {
+    void setAllTreasures(ArrayList<Treasure> allTreasures) {
         Instance().allTreasures = allTreasures;
-    }
-
-    /**
-     * Returns all the uuids of the Treasures that have been found
-     *
-     * @return
-     */
-    Set<String> getUuidTreasuresFound() {
-        return Instance().treasureQuests.keySet();
     }
 
     /**
@@ -91,7 +82,7 @@ public class GameStatus {
      * If treasureQuest already has an entry for the associated Treasure, the provided Quest
      * is appended.
      *
-     * @param quest
+     * @param quest Quest to be added
      */
     void addQuest(Quest quest) {
         String treasureKey = quest.getTreasure().getUuid();
@@ -111,7 +102,7 @@ public class GameStatus {
      * @param uuid uuid of a Treasure
      * @return Quest or null
      */
-    public Quest getLastQuestForTreasureUuid(String uuid) {
+    Quest getLastQuestForTreasureUuid(String uuid) {
         Quest lastQuest;
         if (treasureQuests.containsKey(uuid) && treasureQuests.get(uuid).size() > 0) {
             // The associated ArrayList contains at least one entry.

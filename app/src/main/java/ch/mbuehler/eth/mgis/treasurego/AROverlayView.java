@@ -1,14 +1,9 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.location.Location;
-import android.os.Handler;
 import android.view.View;
-import android.widget.Toast;
-
-import java.util.Set;
 
 /**
  * Created by vanagnos on 03.04.2017. Updated by goebelf on 18.04.2018 and Marcel on 25.4.18.
@@ -18,32 +13,34 @@ import java.util.Set;
  * function and how we transform the GPS84 coordinates to camera coordinates.
  */
 public class AROverlayView extends View {
-    Context context;
-    private float[] rotatedProjectionMatrix = new float[16];
-    private Location currentLocation;
     /**
-     * We need access to displayed Toasts such that we can renew the content even when the old
-     * Toast is still showing, so we use an instance variable for Toast.
+     * Application Context
      */
-    private Toast toast;
+    Context context;
+    /**
+     * From sensors
+     */
+    private float[] rotatedProjectionMatrix = new float[16];
+    /**
+     * Holds the current Location
+     */
+    private Location currentLocation;
     /**
      * Updates the Elements of the View that are not related to
      */
     private AROverlayViewUpdater viewUpdater;
 
-
     /**
      * Constructor of the AROverlyView class. Takes the context and List of ARPoints as arguments.
      *
-     * @param context the context creating the class
+     * @param context     the context creating the class
+     * @param viewUpdater AROverlayViewUpdater
      */
     public AROverlayView(Context context, AROverlayViewUpdater viewUpdater) {
         super(context);
 
         this.context = context;
         this.viewUpdater = viewUpdater;
-
-        toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
     }
 
     /**

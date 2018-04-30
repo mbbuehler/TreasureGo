@@ -42,22 +42,22 @@ class AROverlayViewUpdater extends ViewUpdater {
     /**
      * Holds a layout for each Gem
      */
-    HashMap<ARGem, ARGemLayout> arGemLayouts = new HashMap<>();
+    private HashMap<ARGem, ARGemLayout> arGemLayouts = new HashMap<>();
     /**
      * Object holding paint information. See initPaint() for values.
      */
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     /**
      * Main View of this activity. Here we will add the Views for the Gems.
      */
-    RelativeLayout arActivityView;
+    private RelativeLayout arActivityView;
 
     /**
      * Updates TextView that shows the user how many Gems are left to find.
      *
      * @param numberARGemsNotFound number of ARGems that have not been collected
      */
-    void updateARGemsNotFound(int numberARGemsNotFound) {
+    private void updateARGemsNotFound(int numberARGemsNotFound) {
         String text = String.format("%d %s", numberARGemsNotFound, activity.getString(R.string.arGemsLeft));
         arGemsNotFoundTextView.setText(text);
     }
@@ -148,11 +148,12 @@ class AROverlayViewUpdater extends ViewUpdater {
 
     /**
      * Updates the ARGem position.
+     *
      * @param arGem ARGem
-     * @param x x-coordinate on the screen (pixel)
-     * @param y y-coordinate on the screen (pixel)
+     * @param x     x-coordinate on the screen (pixel)
+     * @param y     y-coordinate on the screen (pixel)
      */
-    private void updateARGemPosition(ARGem arGem, double x, double y){
+    private void updateARGemPosition(ARGem arGem, double x, double y) {
         // The position is determined by the layout
         ARGemLayout gemLayout = this.arGemLayouts.get(arGem);
         gemLayout.updatePosition((int) x, (int) y, activity);
@@ -166,6 +167,7 @@ class AROverlayViewUpdater extends ViewUpdater {
     /**
      * The user has touched the screen. If an ARGem has been touched, collect it. Otherwise
      * show an info Toast telling the user that she did not catch an ARGem.
+     *
      * @param x x-coordinate on the screen (pixel)
      * @param y y-coordinate on the screen (pixel)
      */

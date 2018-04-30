@@ -8,7 +8,7 @@ class Formatter {
     /**
      * Formats Double for given precision
      *
-     * @param d
+     * @param d double value
      * @param precision digits after the comma, e.g. 3 for 0.123
      * @return String
      */

@@ -24,46 +24,37 @@ class ARViewUpdater extends ViewUpdater {
     private SurfaceView surfaceView;
     private FrameLayout cameraContainerLayout;
     private AROverlayView arOverlayView;
-
     private ARCameraView arCamera;
     private Camera camera;
 
-    private TextView tvCurrentLocation;
-
-
+    /**
+     *
+     * @param activity Activity
+     */
     ARViewUpdater(ARActivity activity) {
         timerTextView = activity.findViewById(R.id.timePassedValue);
-        tvCurrentLocation = activity.findViewById(R.id.tv_current_location);
 
         // Bind Views
         cameraContainerLayout = activity.findViewById(R.id.camera_container_layout);
         surfaceView = activity.findViewById(R.id.surface_view);
         arOverlayView = new AROverlayView(activity, new AROverlayViewUpdater(activity));
+
         // This listener handles onTouchEvents, e.g. collecting ARGems
         arOverlayView.setOnTouchListener(arOverlayView.getOnTouchListener());
-
-
     }
 
     /**
      * Updates the field for time
      */
-    void updateTime() {
+    private void updateTime() {
         String formattedTimeDifference = this.getFormattedTimeDifference(getDeltaTimeMillis(ARGameStatus.Instance().getStartTime()));
         timerTextView.setText(formattedTimeDifference);
-    }
-
-    void updateTVCurrentLocation(Location location) {
-        tvCurrentLocation.setText(String.format("lat: %s \nlon: %s \naltitude: %s \n",
-                location.getLatitude(), location.getLongitude(), location.getAltitude()));
-
     }
 
     /**
      * Initialize the GUI elements to draw the AR Points
      */
-    public void initAROverlayView() {
-
+    void initAROverlayView() {
         if (arOverlayView.getParent() != null) {
             ((ViewGroup) arOverlayView.getParent()).removeView(arOverlayView);
         }
@@ -71,14 +62,12 @@ class ARViewUpdater extends ViewUpdater {
     }
 
     /**
-     * Initiliaze the GUI elements and the camera View
+     * Initialize the GUI elements and the camera View
      */
-    public void initARCameraView(Activity activity) {
-
+    void initARCameraView(Activity activity) {
         if (surfaceView.getParent() != null) {
             ((ViewGroup) surfaceView.getParent()).removeView(surfaceView);
         }
-
         cameraContainerLayout.addView(surfaceView);
 
         if (arCamera == null) {
@@ -104,6 +93,7 @@ class ARViewUpdater extends ViewUpdater {
     }
 
     void onPause(){
+        // We disable the camera to save battery.
         if (camera != null) {
             camera.setPreviewCallback(null);
             camera.stopPreview();
@@ -121,13 +111,13 @@ class ARViewUpdater extends ViewUpdater {
         Matrix.multiplyMM(rotatedProjectionMatrix, 0, projectionMatrix, 0, rotationMatrixFromVector, 0);
         arOverlayView.updateRotatedProjectionMatrix(rotatedProjectionMatrix);
 
+        // It is ok to update time here because we get Sensor input all the time.
+        updateTime();
     }
 
     void onLocationChanged(Location location){
         if (arOverlayView != null) {
             arOverlayView.updateCurrentLocation(location);
-            updateTVCurrentLocation(location);
-            updateTime();
         }
     }
 

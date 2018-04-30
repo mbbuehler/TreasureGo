@@ -1,19 +1,13 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
-
-import java.util.Set;
 
 
 /**
  * OnTouchListener for the AROverlayView.
  */
-public class AROverlayViewOnTouchListener implements View.OnTouchListener{
+public class AROverlayViewOnTouchListener implements View.OnTouchListener {
 
     /**
      * Updates the Elements of the View that are not related to
@@ -37,8 +31,9 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
     /**
      * The user has touched the screen. If she touched on a Gem, it will be collected.
      * If not, a Toast will show a message.
-     * @param view
-     * @param motionEvent
+     *
+     * @param view        View
+     * @param motionEvent MotionEvent
      * @return true if Event was handled and false if it was ignored.
      */
     @Override
@@ -49,7 +44,7 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
         // Only take action if the last TouchEvent was not a too short time ago.
         long currentTime = System.currentTimeMillis();
         // Ignore touches when all Gems have been collected
-        if(currentTime - lastTouch > DELAY_BETWEEN_TOUCHES) {
+        if (currentTime - lastTouch > DELAY_BETWEEN_TOUCHES) {
             lastTouch = currentTime;
 
             // Get touch coordinates
@@ -62,5 +57,4 @@ public class AROverlayViewOnTouchListener implements View.OnTouchListener{
         // We did ignore this event.
         return false;
     }
-
 }

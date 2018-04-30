@@ -51,7 +51,6 @@ public class TreasureFoundActivity extends AppCompatActivity {
         arGemCollectionTimeTextView.setText(gemCollectionTimeText);
     }
 
-
     /**
      * Closes the app
      *

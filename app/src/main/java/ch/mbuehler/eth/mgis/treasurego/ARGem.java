@@ -49,23 +49,15 @@ public class ARGem {
         return String.format("ARGem(%f,%f)",x,y);
     }
 
-    public double getX() {
-        return x;
-    }
-
-    public void setX(double x) {
+    void setX(double x) {
         this.x = x;
     }
 
-    public double getY() {
-        return y;
-    }
-
-    public void setY(double y) {
+    void setY(double y) {
         this.y = y;
     }
 
-    public int getImageId() {
+    int getImageId() {
         return imageId;
     }
 }
