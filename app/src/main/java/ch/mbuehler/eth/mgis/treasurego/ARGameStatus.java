@@ -19,6 +19,10 @@ public class ARGameStatus {
 
     Treasure targetTreasure;
     HashMap<ARGem, Boolean> arGems;
+    /**
+     * Keep track of the time since we started the Quest (needed for calculating reward)
+     */
+    private long startTime;
 
 
         /**
@@ -32,6 +36,10 @@ public class ARGameStatus {
                 instance = new ch.mbuehler.eth.mgis.treasurego.ARGameStatus();
             }
             return instance;
+        }
+
+        ARGameStatus(){
+            startTime = System.currentTimeMillis();
         }
 
     public Treasure getTargetTreasure() {
@@ -56,5 +64,9 @@ public class ARGameStatus {
 
     public void setArGems(HashMap<ARGem, Boolean> arGems) {
         this.arGems = arGems;
+    }
+
+    public long getStartTime() {
+        return startTime;
     }
 }

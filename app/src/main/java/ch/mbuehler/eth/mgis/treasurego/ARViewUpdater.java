@@ -61,27 +61,15 @@ public class ARViewUpdater extends ViewUpdater {
     /**
      * @param activity Activity whose View will be updated
      */
-    ARViewUpdater(ARActivity activity, Set<ARGem> arGems) {
+    ARViewUpdater(ARActivity activity) {
         this.activity = activity;
-//        arActivityView = activity.findViewById(R.id.activity_ar);
-//
-//        for(ARGem arGem: arGems){
-//            RelativeLayout layout = (RelativeLayout) View.inflate(activity, R.layout.image_gemview, null);
-//            ARGemLayout gemLayout = new ARGemLayout(layout);
-//            ((ImageView)gemLayout.layout.findViewById(R.id.image_gem)).setImageResource(arGem.getImageId());
-//            arGemLayouts.put(arGem, gemLayout);
-//            arActivityView.addView(layout, gemLayout.params);
-//        }
 
         // We keep track of when we started
         this.startTime = System.currentTimeMillis();
 
         timerTextView = activity.findViewById(R.id.timePassedValue);
         tvCurrentLocation = activity.findViewById(R.id.tv_current_location);
-
     }
-
-
 
     /**
      * Updates the field for time

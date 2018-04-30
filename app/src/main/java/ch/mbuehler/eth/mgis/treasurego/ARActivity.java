@@ -79,9 +79,9 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         ARGameStatus.Instance().setArGems(arGems);
 
 
-        viewUpdater = new ARViewUpdater(this, arGems.keySet());
+        viewUpdater = new ARViewUpdater(this);
 
-        arView = new AROverlayView(this, new AROverlayViewUpdater(this, arGems.keySet()));
+        arView = new AROverlayView(this, new AROverlayViewUpdater(this));
         // This listener handles onTouchEvents, e.g. collecting ARGems
         arView.setOnTouchListener(arView.getOnTouchListener());
     }
