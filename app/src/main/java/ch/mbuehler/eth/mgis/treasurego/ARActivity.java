@@ -51,8 +51,6 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     private LocationManager locationManager;
     boolean isGPSEnabled;
 
-    Treasure targetTreasure;
-    HashMap<ARGem, Boolean> arGems;
 
 
     /**
@@ -69,14 +67,17 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
         cameraContainerLayout = findViewById(R.id.camera_container_layout);
         surfaceView = findViewById(R.id.surface_view);
 
-        // Obtain target Treasure from Intent
-        targetTreasure = Treasure.unserializeTreasureFromIntent(getIntent());
+        // Obtain target Treasure from Intent and save it
+        Treasure targetTreasure  =Treasure.unserializeTreasureFromIntent(getIntent());
+        ARGameStatus.Instance().setTargetTreasure(targetTreasure);
 
         // Current altitude of user
         int currentAltitude = Integer.parseInt(getIntent().getStringExtra(Constant.ALTITUDE_KEY));
-
         // Create the ARGems that the user is supposed to collect
-        arGems = new ARGemFactory().initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
+        HashMap<ARGem, Boolean> arGems = new ARGemFactory().initializeRandomARGems(5, targetTreasure.getLocation(), 0.05, 0.15, currentAltitude);
+        // Save it such that other classes can access
+        ARGameStatus.Instance().setArGems(arGems);
+
 
         viewUpdater = new ARViewUpdater(this, arGems.keySet());
 
@@ -341,13 +342,5 @@ public class ARActivity extends AppCompatActivity implements SensorEventListener
     @Override
     public void onProviderDisabled(String provider) {
         //do nothing
-    }
-
-    public Set<ARGem> getARGems(){
-        return arGems.keySet();
-    }
-
-    public void removeARGem(ARGem arGem){
-        this.arGems.remove(arGem);
     }
 }

@@ -15,10 +15,6 @@ import java.util.Set;
  */
 public class AROverlayViewOnTouchListener implements View.OnTouchListener{
 
-//    /**
-//     * Gems that the user is supposed to collect.
-//     */
-//    private Set<ARGem> arGems;
     /**
      * Updates the Elements of the View that are not related to
      */

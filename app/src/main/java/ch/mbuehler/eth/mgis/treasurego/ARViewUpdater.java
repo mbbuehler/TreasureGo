@@ -36,8 +36,6 @@ public class ARViewUpdater extends ViewUpdater {
     long lastDrawUpdate = System.currentTimeMillis();
     long DELTA_DRAW_UPDATE = 1;
 
-    HashMap<ARGem, ARGemLayout> arGemLayouts = new HashMap<>();
-
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     RelativeLayout arActivityView;

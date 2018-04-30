@@ -1,6 +1,5 @@
 package ch.mbuehler.eth.mgis.treasurego;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -97,6 +96,9 @@ public class AROverlayViewUpdater extends ViewUpdater {
 
         arGemsNotFoundTextView = activity.findViewById(R.id.arGemsNotFound);
 
+        toast = Toast.makeText(activity, "", Toast.LENGTH_SHORT);
+        startTime = System.currentTimeMillis();
+
     }
 
     void updateOnDraw(Canvas canvas, Location currentLocation, float[] rotatedProjectionMatrix){
@@ -110,7 +112,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
             paint.setTextSize(60);
 
             // Transform the ARPoints coordinates from WGS84 to camera coordinates
-            for (ARGem arGem : activity.getARGems()) {
+            for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
 
                 // First we transform from GPS coordinates to ECEF coordinates and then to Navigation Coordinates
                 float[] currentLocationInECEF = CoordinateTransformator.WSG84toECEF(currentLocation);
@@ -149,7 +151,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
     }
 
     public boolean onTouch(double x, double y){
-        if(activity.getARGems().size() > 0){
+        if(ARGameStatus.Instance().getARGemsSet().size() > 0){
         // Find closest ARGem
         ARGem closestARGem = findClosestGem(x, y);
         double closestDistance = closestARGem.euclideanDistanceTo(x, y);
@@ -157,7 +159,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
         // If the are close enough to the closest ARGem, then take action.
         if (closestDistance < TOUCH_DISTANCE_THRESHOLD) {
             // We can't collect this Gem again.
-            activity.removeARGem(closestARGem);
+            ARGameStatus.Instance().removeARGem(closestARGem);
             arActivityView.removeView(arGemLayouts.get(closestARGem).layout);
 
 
@@ -166,9 +168,9 @@ public class AROverlayViewUpdater extends ViewUpdater {
             showToastInfo(info);
 
             // Update TextView
-            updateARGemsNotFound(activity.getARGems().size());
+            updateARGemsNotFound(ARGameStatus.Instance().getARGemsSet().size());
 
-            if (activity.getARGems().isEmpty()) {
+            if (ARGameStatus.Instance().getARGemsSet().isEmpty()) {
                 // The user has found all ARGems. We can continue.
                 onAllGemsCollected();
                 return true;
@@ -187,14 +189,15 @@ public class AROverlayViewUpdater extends ViewUpdater {
      * the user to the TreasureFoundActivity
      */
     private void onAllGemsCollected(){
+        String targetTreasureUUID = ARGameStatus.Instance().getTargetTreasure().getUuid();
         // Update the current Quest
-        Quest quest = GameStatus.Instance().getLastQuestForTreasureUuid(activity.targetTreasure.getUuid());
+        Quest quest = GameStatus.Instance().getLastQuestForTreasureUuid(targetTreasureUUID);
         quest.setGemCollectionTimeMillis(getDeltaTimeMillis(getStartTime()));
         quest.setStatus(QuestStatus.COMPLETED);
 
         // Forward user to the next Activity
         Intent intent = new Intent(activity, TreasureFoundActivity.class);
-        intent.putExtra(Constant.TREASURE_KEY, activity.targetTreasure.getUuid());
+        intent.putExtra(Constant.TREASURE_KEY, targetTreasureUUID);
         activity.startActivity(intent);
 
     }
@@ -228,7 +231,7 @@ public class AROverlayViewUpdater extends ViewUpdater {
         double closestDistance = 99999999;
         ARGem closestARGem = null;
 
-        for (ARGem arGem : activity.getARGems()) {
+        for (ARGem arGem : ARGameStatus.Instance().getARGemsSet()) {
             double distance = arGem.euclideanDistanceTo(x, y);
             if (closestARGem == null || distance < closestDistance) {
                 // We found an ARGem that is closer.

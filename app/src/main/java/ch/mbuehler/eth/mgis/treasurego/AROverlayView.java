@@ -96,7 +96,6 @@ public class AROverlayView extends View {
     /**
      * Returns the OnTouchListener for this View.
      *
-     * @param targetTreasureUUID UUID of target Treasure
      * @return instance of AROverlayViewOnTouchListener, initialized with the variables of this View.
      */
     public OnTouchListener getOnTouchListener() {
