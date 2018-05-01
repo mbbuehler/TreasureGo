@@ -18,11 +18,6 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements PermissionActionable {//implements AdapterView.OnItemSelectedListener{
 
     /**
-     * Key that is used to pass data for a treasure to other Intents
-     */
-    public static final String TREASURE_KEY = "Treasure";
-
-    /**
      * Indicate when the user has selected a Treasure. This prevents that
      * more than one CompassActivity is created.
      */
@@ -34,7 +29,8 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
     String[] permissions = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CAMERA,
     };
 
     /**
@@ -44,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // If call onCreate with this extra, this means we have to close the app.
+        if (getIntent().getBooleanExtra("LOGOUT", false)) {
+            finish();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         permissionChecker = new PermissionChecker(this);
@@ -55,14 +56,14 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
     protected void onResume() {
         super.onResume();
 
-        // Do not reset the Treasures if we have already initalized them. This happens when we come
+        // Do not reset the Treasures if we have already initialized them. This happens when we come
         // back to this Activity after finding a Treasure
         if (!GameStatus.Instance().hasBeenInitialized()) {
             // The game has not been initialized. Initialize treasures now.
             resetTreasures();
             GameStatus.Instance().setHasBeenInitialized(true);
         } else {
-            // The game has already been initialized. Update the view such that we can see which
+            // The game has already been initialized. Update the arActivityView such that we can see which
             // Treasures we have already found.
             updateTreasureListview();
         }
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                 permissionChecker.checkPermissions(permissions);
             }
         }, 3000);
-        // It was the first time we ask the user. Give him one more chance.}
+        // It was the first time we ask the user. Give him one more chance.
     }
 
     /**
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         askAgainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                System.exit(0);
+                finish();
             }
         }, 3000);
     }
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         GameStatus.Instance().reset(getApplicationContext());
         // Reload View
         updateTreasureListview();
+        updateCurrentScore();
         if (GameStatus.Instance().hasBeenInitialized()) {
             // Don't display Toast if we are loading the Treasures for the first time
             Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
@@ -146,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     private void updateTreasureListview() {
         // We use a custom Adapter such that we can display each Treasure with name, reward and an image
-        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getTreasureQuests(), getApplicationContext());
+        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), getApplicationContext());
 
-        // This view holds the Treasures to be selected
+        // This arActivityView holds the Treasures to be selected
         final ListView treasureListView = findViewById(R.id.treasurelistview);
 
-        // The adapter adds the data to the view
+        // The adapter adds the data to the arActivityView
         treasureListView.setAdapter(adapter);
 
         // Set the listener that should wait for a user selection
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
      * @return AdapterView.OnItemClickListener
      */
     public AdapterView.OnItemClickListener getOnTreasureSelectedListener() {
-        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+        return new AdapterView.OnItemClickListener() {
             // This Listener is called when the user selects a Treasure from the list.
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // If we do not check here, we might end up
@@ -186,12 +188,12 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                     Treasure selectedTreasure = (Treasure) parent.getAdapter().getItem(position);
                     // Serialize and send the target Treasure with the Intent.
                     String serializedTreasure = selectedTreasure.serialize();
-                    intent.putExtra(TREASURE_KEY, serializedTreasure);
+                    intent.putExtra(Constant.TREASURE_KEY, serializedTreasure);
                     // Starting the CompassActivity.
                     startActivity(intent);
+                    finish();
                 }
             }
         };
-        return listener;
     }
 }

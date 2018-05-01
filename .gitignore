@@ -75,3 +75,4 @@ fastlane/readme.md
 
 *.zip
 *.idea
+app/src/main/res/raw/treasures2.csv

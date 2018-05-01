@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout android:layout_height="10dp"
+    android:layout_width="60dp"
+    android:id="@+id/image_gemview"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<ImageView
+    android:id="@+id/image_gem"
+    android:layout_width="@dimen/gem_width"
+    android:layout_height="@dimen/gem_height"
+    app:srcCompat="@drawable/fireopal_small"
+
+    xmlns:android="http://schemas.android.com/apk/res/android" />
+</RelativeLayout>

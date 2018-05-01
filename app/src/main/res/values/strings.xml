@@ -43,4 +43,12 @@
     <string name="title_activity_maps">Map</string>
     <string name="openMap">Get hint!</string>
     <string name="hintInfo">Hint used. No more hints left. Good luck with your Quest, fearless hunter!</string>
+    <string name="gpsIsLoading">GPS is loading...</string>
+    <string name="collected">collected!</string>
+    <string name="noGemFoundHere">No gem found here. Try again!</string>
+    <string name="arGemsLeft">Gems left to find</string>
+    <string name="arGemCollectionTimeText">Time for collecting gems:</string>
+    <string name="timeUnitSeconds">s</string>
+    <string name="cameraNotFound">Camera not found</string>
+    <string name="csvCouldNotBeLoaded">CSV file could not be loaded.</string>
 </resources>

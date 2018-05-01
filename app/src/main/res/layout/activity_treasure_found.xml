@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="sadfjlk sdfljdsk ssa "
+        android:text="@string/n.a."
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -42,7 +42,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/reward"
-        app:srcCompat="@drawable/treasure_open" />
+        app:srcCompat="@drawable/treasurego_launcher" />
 
     <TextView
         android:id="@+id/treasureName"
@@ -75,18 +75,18 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/averageSpeedText"
+                android:id="@+id/arGemCollectionTimeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="0"
                 android:layout_marginEnd="8dp"
-                android:text="@string/averageSpeed"
+                android:text="@string/arGemCollectionTimeText"
                 android:textColor="@android:color/black"
                 app:layout_constraintTop_toBottomOf="@+id/currentSpeedText" />
 
 
             <TextView
-                android:id="@+id/averageSpeedValue"
+                android:id="@+id/arGemCollectionTimeValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="1"
@@ -99,24 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/TemperatureText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:layout_marginEnd="8dp"
-                android:text="@string/temperature"
-                android:textColor="@android:color/black" />
 
-
-            <TextView
-                android:id="@+id/temperatureValue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_column="1"
-                android:text="@string/n.a."
-                android:textColor="@android:color/black" />
         </TableRow>
 
 

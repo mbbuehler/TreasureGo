@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -69,16 +70,16 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * Max time between location updates
      */
-    private static final long TIME_BW_UPDATES = 1000; // in milliseconds
+    private static final long TIME_BW_UPDATES = 300; // in milliseconds
     /**
      * Distance threshold for location updates
      */
-    private static final long DIST_BW_UPDATES = 5; // in meters
+    private static final long DIST_BW_UPDATES = 1; // in meters
     /**
      * When the user gets closer to the target Treasure than this value,
      * we consider the Treasure as "found"
      */
-    private static final int DIST_TARGET_REACHED = 20; // in meters
+    private static final int DIST_TARGET_REACHED = 10; // in meters
 
     /**
      * Once the target Treasure has been reached, we want to stop updating View
@@ -120,16 +121,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /* ================== Handling Sensor Updates Section  ================== */
 
     /**
-     * Extracts the measured temperature from the sensor values and updates the View.
-     *
-     * @param sensorValues values from the Temperature Sensor
-     */
-    private void handleTemperatureUpdate(float[] sensorValues) {
-        this.currentTemperature = sensorValues[0];
-        viewUpdater.updateTemperature();
-    }
-
-    /**
      * Update the values for the rotationMatrix and orientation.
      * See
      * https://developer.android.com/guide/topics/sensors/sensors_position.html
@@ -144,7 +135,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
 
     /**
      * Distance to target Treasure has changed. If we are close enough to the target Treasure,
-     * we will call onTargetReached(). If not we will update the view with the current distance.
+     * we will call onTargetReached(). If not we will update the arActivityView with the current distance.
      */
     private void handleDistanceToTargetUpdate() {
 
@@ -196,15 +187,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         return this.locationTracker.getAverageSpeed();
     }
 
-    /**
-     * Returns the last measured temperature or 0 if temperature is not available.
-     *
-     * @return
-     */
-    float getCurrentTemperature() {
-        return this.currentTemperature;
-    }
-
     Treasure getTargetTreasure() {
         return this.targetTreasure;
     }
@@ -229,7 +211,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        // Instantiate instances for view updates and locationTracking
+        // Instantiate instances for arActivityView updates and locationTracking
         viewUpdater = new CompassViewUpdater(this);
         locationTracker = new LocationTracker();
 
@@ -243,10 +225,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         // Update the field that names the target Treasure
         // We only need to do that once so we do it here.
         viewUpdater.updateSearchingFor();
-        // Call this at least once.
-        // This will make sure that in case that there is no sensor available
-        // we display the information to the user.
-        viewUpdater.updateTemperature();
 
         // Create the runnable responsible for regular updates
         CompassActivityRunnable runnable = new CompassActivityRunnable(timerHandler, viewUpdater);
@@ -271,10 +249,12 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         super.onPause();
         // Save battery
         this.sensorManager.unregisterListener(this);
+        this.locationManager.removeUpdates(this);
     }
 
     @Override
     public void onLocationChanged(Location currentLocation) {
+        Log.v("LOC", currentLocation.toString());
         // Set instance variable such that other methods can access it
         this.currentLocation = currentLocation;
         // Keep track of all Locations measured
@@ -309,6 +289,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     public void onAbort(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void onMapButtonClicked(View view) {
@@ -317,7 +298,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         Intent intent = new Intent(this, MapsActivity.class);
         // Serialize and send the target Treasure with the Intent.
         String serializedTreasure = getTargetTreasure().serialize();
-        intent.putExtra(MainActivity.TREASURE_KEY, serializedTreasure);
+        intent.putExtra(Constant.TREASURE_KEY, serializedTreasure);
         startActivity(intent);
 
         Toast.makeText(this, R.string.hintInfo, Toast.LENGTH_LONG).show();
@@ -335,13 +316,26 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             this.targetReached = true;
 
             // Save Quest such that we can access it later
-            Quest completedQuest = new Quest(getTargetTreasure(), getAverageSpeed(), getCurrentTemperature(), QuestStatus.COMPLETED);
+            Quest completedQuest = new Quest(getTargetTreasure(), QuestStatus.SEARCHING_GEMS);
             GameStatus.Instance().addQuest(completedQuest);
 
-            // Go to next Activity
-            Intent intent = new Intent(this, TreasureFoundActivity.class);
-            intent.putExtra(MainActivity.TREASURE_KEY, getTargetTreasure().getUuid());
+            Intent intent = new Intent(this, ARActivity.class);
+            intent.putExtra(Constant.TREASURE_KEY, getTargetTreasure().serialize());
+
+            // We want to set the gems in the AR View more or less equal to the target position.
+            // However, as we do not know the altitude of the target position we approximate
+            // it via the altitude of position from where the AR View is launched.
+            String currentAltitudeString;
+            try {
+                currentAltitudeString = Integer.toString((int) getCurrentLocation().getAltitude());
+            } catch (LocationNotFoundException e) {
+                // use a default altitude
+                currentAltitudeString = "0";
+            }
+            intent.putExtra(Constant.ALTITUDE_KEY, currentAltitudeString);
+
             startActivity(intent);
+            this.finish();
         }
     }
 
@@ -357,10 +351,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
             case Sensor.TYPE_ROTATION_VECTOR:
                 // Update device orientation
                 handleRotationUpdate(sensorEvent.values);
-                break;
-            case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                // Update temperature related fields
-                this.handleTemperatureUpdate(sensorEvent.values);
                 break;
             default:
                 break;

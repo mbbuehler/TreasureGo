@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
 
-
 /**
  * This class holds methods for checking whether LocationServices are available.
  */
@@ -40,11 +39,11 @@ class LocationServiceChecker {
      * @return true if LocationServices are enabled
      */
     static boolean areLocationServicesEnabled(LocationManager locationManager, Context context) {
-        boolean gps_enabled = false;
+        boolean gps_enabled;
         try {
             gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         } catch (Exception e) {
-            e.printStackTrace();
+            gps_enabled = false;
         }
         boolean airplaneModeIsOff = !isAirplaneModeOn(context);
         return airplaneModeIsOff && gps_enabled;

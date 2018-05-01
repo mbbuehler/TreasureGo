@@ -18,18 +18,6 @@ import java.util.HashMap;
  * https://www.journaldev.com/10416/android-listview-with-custom-adapter-example-tutorial
  */
 public class TreasureAdapter extends ArrayAdapter<Treasure> {
-    /**
-     * List with Treasures that will be displayed
-     */
-    private ArrayList<Treasure> treasures;
-    /**
-     * HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
-     */
-    private HashMap<String, ArrayList<Quest>> treasureQuests;
-    /**
-     * ApplicationContext
-     */
-    private Context mContext;
 
     /**
      * View lookup cache
@@ -43,28 +31,24 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
     /**
      * @param data           The treasures to be displayed
-     * @param treasureQuests HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
      * @param context        ApplicationContext
      */
-    TreasureAdapter(ArrayList<Treasure> data, HashMap<String, ArrayList<Quest>> treasureQuests, Context context) {
+    TreasureAdapter(ArrayList<Treasure> data, Context context) {
         super(context, R.layout.treasure_row, data);
-        this.treasures = data;
-        this.mContext = context;
-        this.treasureQuests = treasureQuests;
     }
 
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         // Get the data item for this position
         Treasure treasure = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        ViewHolder viewHolder; // view lookup cache stored in tag
+        // Check if an existing arActivityView is being reused, otherwise inflate the arActivityView
+        ViewHolder viewHolder; // arActivityView lookup cache stored in tag
 
         // Only create a new View if necessary
         if (convertView == null) {
             // we need to create a new View
             viewHolder = new ViewHolder();
-            // Create the view with our RelativeLayout template
+            // Create the arActivityView with our RelativeLayout template
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.treasure_row, parent, false);
             // Set the required Text- and ImageViews
@@ -85,21 +69,21 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
         // Set the image
         // Choose Treasure picture depending on whether the Treasure has been found or not
-        if (treasureQuests.keySet().contains(treasure.getUuid())) {
+        if (GameStatus.Instance().hasCompletedQuest(treasure.getUuid())) {
             // The user has already found the Treasure
-            viewHolder.image.setImageResource(R.drawable.treasure_open);
+            viewHolder.image.setImageResource(R.drawable.treasurego_launcher);
         } else {
             // The Treasure has yet to be found
-            viewHolder.image.setImageResource(R.drawable.treasure_closed);
+            viewHolder.image.setImageResource(R.drawable.treasure_closed_small);
         }
-        // Return the completed view
+        // Return the completed arActivityView
         return convertView;
     }
 
     private String getAchievedRewardText(String treasureUuid) {
         int achievedReward = 0;
-        if (treasureQuests.keySet().contains(treasureUuid)) {
-            achievedReward = GameStatus.Instance().getMaxReward(treasureQuests.get(treasureUuid));
+        if (GameStatus.Instance().getTreasureQuests().keySet().contains(treasureUuid)) {
+            achievedReward = GameStatus.Instance().getMaxReward(GameStatus.Instance().getTreasureQuests().get(treasureUuid));
         }
 
         String achievedRewardText = String.format("%d", achievedReward);

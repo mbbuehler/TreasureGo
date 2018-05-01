@@ -44,7 +44,6 @@ public class CompassActivityRunnable implements Runnable {
         // Update various information in View
         viewUpdater.updateAverageSpeed();
         viewUpdater.updateCurrentSpeed();
-        viewUpdater.updateCurrentReward();
         viewUpdater.updateTime();
 
         // Only update arrow once in a while

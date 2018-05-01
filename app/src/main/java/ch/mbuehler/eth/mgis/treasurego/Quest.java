@@ -2,7 +2,7 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 /**
  * This class holds data about Quests.
- * A Quest is a subgame, where the user searches for one Treasure.
+ * A Quest is a sub-game, where the user searches for one Treasure.
  */
 public class Quest {
 
@@ -15,24 +15,18 @@ public class Quest {
      */
     private double avgSpeed;
     /**
-     * Temperature in degrees Celsius
-     */
-    private float temperature;
-    /**
      * Quest status, e.g. COMPLETED
      */
     private QuestStatus status;
 
+    private double gemCollectionTimeMillis = -1;
+
     /**
-     * @param treasure    Target Treasure
-     * @param avgSpeed    average speed achieved in this Quest
-     * @param temperature degrees Celsius
-     * @param status      COMPLETED
+     * @param treasure Target Treasure
+     * @param status   COMPLETED
      */
-    public Quest(Treasure treasure, double avgSpeed, float temperature, QuestStatus status) {
+    public Quest(Treasure treasure, QuestStatus status) {
         this.treasure = treasure;
-        this.avgSpeed = avgSpeed;
-        this.temperature = temperature;
         this.status = status;
     }
 
@@ -52,14 +46,6 @@ public class Quest {
         this.avgSpeed = avgSpeed;
     }
 
-    public float getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(float temperature) {
-        this.temperature = temperature;
-    }
-
     public QuestStatus getStatus() {
         return status;
     }
@@ -68,12 +54,24 @@ public class Quest {
         this.status = status;
     }
 
+
+    public double getGemCollectionTimeMillis() {
+        if (gemCollectionTimeMillis > 0) {
+            return gemCollectionTimeMillis;
+        }
+        return -1;
+    }
+
+    public void setGemCollectionTimeMillis(double gemCollectionTimeMillis) {
+        this.gemCollectionTimeMillis = gemCollectionTimeMillis;
+    }
+
     /**
      * Calculates the reward achieved for this Quest
      *
      * @return int number of coins received
      */
     public int getReward() {
-        return RewardCalculator.calculateReward(getTreasure(), getAvgSpeed(), getTemperature());
+        return RewardCalculator.calculateReward(getTreasure(), getGemCollectionTimeMillis());
     }
 }

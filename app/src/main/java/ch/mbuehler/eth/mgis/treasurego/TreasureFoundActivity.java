@@ -25,7 +25,7 @@ public class TreasureFoundActivity extends AppCompatActivity {
 
         // Recover Treasure from Intent
         Intent intent = getIntent();
-        String treasureUuid = intent.getStringExtra(MainActivity.TREASURE_KEY);
+        String treasureUuid = intent.getStringExtra(Constant.TREASURE_KEY);
         // Retrieve the Quest object related to this treasure,
         // i.e. last saved Quest for this Treasure
         completedQuest = GameStatus.Instance().getLastQuestForTreasureUuid(treasureUuid);
@@ -46,15 +46,10 @@ public class TreasureFoundActivity extends AppCompatActivity {
         String treasureNameText = completedQuest.getTreasure().getName();
         treasureNameView.setText(treasureNameText);
 
-        TextView avgSpeedView = findViewById(R.id.averageSpeedValue);
-        String avgSpeedText = Formatter.formatDouble(completedQuest.getAvgSpeed(), 1) + getString(R.string.speedUnit);
-        avgSpeedView.setText(avgSpeedText);
-
-        TextView temperatureView = findViewById(R.id.temperatureValue);
-        TemperatureText temperatureText = new TemperatureText(this);
-        temperatureView.setText(temperatureText.getText(completedQuest.getTemperature()));
+        TextView arGemCollectionTimeTextView = findViewById(R.id.arGemCollectionTimeValue);
+        String gemCollectionTimeText = Formatter.formatDouble(completedQuest.getGemCollectionTimeMillis() / 1000, 1) + getString(R.string.timeUnitSeconds);
+        arGemCollectionTimeTextView.setText(gemCollectionTimeText);
     }
-
 
     /**
      * Closes the app
@@ -63,7 +58,14 @@ public class TreasureFoundActivity extends AppCompatActivity {
      */
     public void closeApp(View view) {
         Toast.makeText(this, R.string.thanksBye, Toast.LENGTH_SHORT);
-        System.exit(0);
+        // Solution to close app from Stackoverlow:
+        // https://stackoverflow.com/questions/2092951/how-to-close-android-application
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("LOGOUT", true);
+        startActivity(intent);
+
+        finish();
     }
 
     /**

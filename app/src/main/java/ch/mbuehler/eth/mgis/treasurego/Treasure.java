@@ -127,7 +127,7 @@ public class Treasure implements Serializable {
      * @return Treasure
      */
     static Treasure unserializeTreasureFromIntent(Intent intent) {
-        String treasureSerialized = intent.getStringExtra(MainActivity.TREASURE_KEY);
+        String treasureSerialized = intent.getStringExtra(Constant.TREASURE_KEY);
         return new Treasure(treasureSerialized);
     }
 
