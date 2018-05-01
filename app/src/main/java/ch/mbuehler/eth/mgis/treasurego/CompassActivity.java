@@ -187,15 +187,6 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
         return this.locationTracker.getAverageSpeed();
     }
 
-    /**
-     * Returns the last measured temperature or 0 if temperature is not available.
-     *
-     * @return
-     */
-    float getCurrentTemperature() {
-        return this.currentTemperature;
-    }
-
     Treasure getTargetTreasure() {
         return this.targetTreasure;
     }
@@ -298,6 +289,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     public void onAbort(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void onMapButtonClicked(View view) {

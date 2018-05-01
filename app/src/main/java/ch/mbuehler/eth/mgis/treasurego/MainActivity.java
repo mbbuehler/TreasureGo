@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
                     intent.putExtra(Constant.TREASURE_KEY, serializedTreasure);
                     // Starting the CompassActivity.
                     startActivity(intent);
+                    finish();
                 }
             }
         };
