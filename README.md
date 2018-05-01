@@ -30,3 +30,17 @@ Here are some ideas about possible new features:
 Android SDK Version
 =========
 Target SDK Version: 27
+
+
+Screenshots
+=========
+## Main View
+![main](https://user-images.githubusercontent.com/9430720/39466708-9160a868-4d2a-11e8-9bc6-0eceb531508d.png)
+## Compass View
+![compass](https://user-images.githubusercontent.com/9430720/39466721-a2b13d44-4d2a-11e8-8518-aa4f6f1f7384.png)
+## Augmented Reality View
+![fireopal](https://user-images.githubusercontent.com/9430720/39466728-a7a9a70a-4d2a-11e8-98e5-567d8eb1c95b.png)
+## Map View
+![maps](https://user-images.githubusercontent.com/9430720/39466731-a9a20110-4d2a-11e8-80d4-67c1a1620f58.png)
+## Treasure Found View
+![treasure-found](https://user-images.githubusercontent.com/9430720/39466732-abbfda94-4d2a-11e8-968c-e674630f2e31.png)
