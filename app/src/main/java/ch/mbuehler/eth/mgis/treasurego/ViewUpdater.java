@@ -7,6 +7,7 @@ abstract class ViewUpdater {
 
     /**
      * Returns the time difference between start time and current time
+     *
      * @param startTime starting time in milliseconds
      * @return time difference in milliseconds
      */
@@ -17,6 +18,7 @@ abstract class ViewUpdater {
 
     /**
      * Reformats deltaTimeMillis to a String representation 00:00:00 (hours:minutes:seconds).
+     *
      * @param deltaTimeMillis time to be formatted in milliseconds
      * @return formatted String
      */
