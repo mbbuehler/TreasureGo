@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
     protected void onResume() {
         super.onResume();
 
-        // Do not reset the Treasures if we have already initalized them. This happens when we come
+        // Do not reset the Treasures if we have already initialized them. This happens when we come
         // back to this Activity after finding a Treasure
         if (!GameStatus.Instance().hasBeenInitialized()) {
             // The game has not been initialized. Initialize treasures now.
@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
         GameStatus.Instance().reset(getApplicationContext());
         // Reload View
         updateTreasureListview();
+        updateCurrentScore();
         if (GameStatus.Instance().hasBeenInitialized()) {
             // Don't display Toast if we are loading the Treasures for the first time
             Toast.makeText(getApplicationContext(), R.string.done, Toast.LENGTH_SHORT).show();
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements PermissionActiona
 
     private void updateTreasureListview() {
         // We use a custom Adapter such that we can display each Treasure with name, reward and an image
-        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), GameStatus.Instance().getTreasureQuests(), getApplicationContext());
+        TreasureAdapter adapter = new TreasureAdapter(GameStatus.Instance().getAllTreasures(), getApplicationContext());
 
         // This arActivityView holds the Treasures to be selected
         final ListView treasureListView = findViewById(R.id.treasurelistview);

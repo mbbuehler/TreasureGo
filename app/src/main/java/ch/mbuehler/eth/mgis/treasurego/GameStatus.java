@@ -130,7 +130,7 @@ class GameStatus {
      * @param quests Quest
      * @return int maximum reward found in quests
      */
-    public int getMaxReward(ArrayList<Quest> quests) {
+    int getMaxReward(ArrayList<Quest> quests) {
         int maxReward = 0;
         // Iterate through quests to find maximum reward
         for (Quest quest : quests) {
@@ -165,5 +165,21 @@ class GameStatus {
 
     HashMap<String, ArrayList<Quest>> getTreasureQuests() {
         return treasureQuests;
+    }
+
+    /**
+     * Returns true if the treasure with given UUID has been found once.
+     * @param treasureUUID UUID of treasure
+     * @return true if found and false otherwise
+     */
+    boolean hasCompletedQuest(String treasureUUID){
+        if(treasureQuests.containsKey(treasureUUID)){
+            for(Quest quest: treasureQuests.get(treasureUUID)){
+                if(quest.getStatus() == QuestStatus.COMPLETED){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

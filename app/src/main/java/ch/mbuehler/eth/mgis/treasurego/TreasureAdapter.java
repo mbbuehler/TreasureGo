@@ -18,10 +18,6 @@ import java.util.HashMap;
  * https://www.journaldev.com/10416/android-listview-with-custom-adapter-example-tutorial
  */
 public class TreasureAdapter extends ArrayAdapter<Treasure> {
-    /**
-     * HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
-     */
-    private HashMap<String, ArrayList<Quest>> treasureQuests;
 
     /**
      * View lookup cache
@@ -35,12 +31,10 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
     /**
      * @param data           The treasures to be displayed
-     * @param treasureQuests HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
      * @param context        ApplicationContext
      */
-    TreasureAdapter(ArrayList<Treasure> data, HashMap<String, ArrayList<Quest>> treasureQuests, Context context) {
+    TreasureAdapter(ArrayList<Treasure> data, Context context) {
         super(context, R.layout.treasure_row, data);
-        this.treasureQuests = treasureQuests;
     }
 
     @NonNull
@@ -75,7 +69,7 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
         // Set the image
         // Choose Treasure picture depending on whether the Treasure has been found or not
-        if (treasureQuests.keySet().contains(treasure.getUuid())) {
+        if (GameStatus.Instance().hasCompletedQuest(treasure.getUuid())) {
             // The user has already found the Treasure
             viewHolder.image.setImageResource(R.drawable.treasurego_launcher);
         } else {
@@ -88,8 +82,8 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
 
     private String getAchievedRewardText(String treasureUuid) {
         int achievedReward = 0;
-        if (treasureQuests.keySet().contains(treasureUuid)) {
-            achievedReward = GameStatus.Instance().getMaxReward(treasureQuests.get(treasureUuid));
+        if (GameStatus.Instance().getTreasureQuests().keySet().contains(treasureUuid)) {
+            achievedReward = GameStatus.Instance().getMaxReward(GameStatus.Instance().getTreasureQuests().get(treasureUuid));
         }
 
         String achievedRewardText = String.format("%d", achievedReward);
