@@ -19,17 +19,9 @@ import java.util.HashMap;
  */
 public class TreasureAdapter extends ArrayAdapter<Treasure> {
     /**
-     * List with Treasures that will be displayed
-     */
-    private ArrayList<Treasure> treasures;
-    /**
      * HashMap with Key:Treasure uuid and Value: List ofcompleted Quests
      */
     private HashMap<String, ArrayList<Quest>> treasureQuests;
-    /**
-     * ApplicationContext
-     */
-    private Context mContext;
 
     /**
      * View lookup cache
@@ -48,8 +40,6 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
      */
     TreasureAdapter(ArrayList<Treasure> data, HashMap<String, ArrayList<Quest>> treasureQuests, Context context) {
         super(context, R.layout.treasure_row, data);
-        this.treasures = data;
-        this.mContext = context;
         this.treasureQuests = treasureQuests;
     }
 
@@ -87,10 +77,10 @@ public class TreasureAdapter extends ArrayAdapter<Treasure> {
         // Choose Treasure picture depending on whether the Treasure has been found or not
         if (treasureQuests.keySet().contains(treasure.getUuid())) {
             // The user has already found the Treasure
-            viewHolder.image.setImageResource(R.drawable.treasure_open);
+            viewHolder.image.setImageResource(R.drawable.treasurego_launcher);
         } else {
             // The Treasure has yet to be found
-            viewHolder.image.setImageResource(R.drawable.treasure_closed);
+            viewHolder.image.setImageResource(R.drawable.treasure_closed_small);
         }
         // Return the completed arActivityView
         return convertView;

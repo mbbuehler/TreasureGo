@@ -85,6 +85,6 @@
 
         android:adjustViewBounds="true"
         android:cropToPadding="false"
-        app:srcCompat="@drawable/treasure_closed" />
+        app:srcCompat="@drawable/treasure_closed_small" />
 
 </RelativeLayout>
