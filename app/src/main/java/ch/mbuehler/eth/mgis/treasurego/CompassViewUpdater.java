@@ -19,11 +19,6 @@ class CompassViewUpdater extends ViewUpdater {
     private long startTime;
 
     /**
-     *
-     */
-    private final int ARROW_UPDATE_DELAY = 500 * 1000000;  // in nanoseconds. 500ms
-
-    /**
      * @param activity Activity whose View will be updated
      */
     CompassViewUpdater(CompassActivity activity) {

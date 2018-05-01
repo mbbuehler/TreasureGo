@@ -31,9 +31,8 @@ class ARViewUpdater extends ViewUpdater {
      * @param activity Activity
      */
     ARViewUpdater(ARActivity activity) {
-        timerTextView = activity.findViewById(R.id.timePassedValue);
-
         // Bind Views
+        timerTextView = activity.findViewById(R.id.timePassedValue);
         cameraContainerLayout = activity.findViewById(R.id.camera_container_layout);
         surfaceView = activity.findViewById(R.id.surface_view);
         arOverlayView = new AROverlayView(activity, new AROverlayViewUpdater(activity));
@@ -116,10 +115,9 @@ class ARViewUpdater extends ViewUpdater {
 
     void onLocationChanged(Location location) {
         if (arOverlayView != null) {
+            // Propagate event to arOverlayView
             arOverlayView.updateCurrentLocation(location);
         }
     }
-
-
 }
 

@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
 
-
 /**
  * This class holds methods for checking whether LocationServices are available.
  */

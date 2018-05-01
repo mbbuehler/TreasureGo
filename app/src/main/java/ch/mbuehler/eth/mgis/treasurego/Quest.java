@@ -2,7 +2,7 @@ package ch.mbuehler.eth.mgis.treasurego;
 
 /**
  * This class holds data about Quests.
- * A Quest is a subgame, where the user searches for one Treasure.
+ * A Quest is a sub-game, where the user searches for one Treasure.
  */
 public class Quest {
 

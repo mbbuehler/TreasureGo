@@ -79,7 +79,7 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
      * When the user gets closer to the target Treasure than this value,
      * we consider the Treasure as "found"
      */
-    private static final int DIST_TARGET_REACHED = 200; // in meters
+    private static final int DIST_TARGET_REACHED = 10; // in meters
 
     /**
      * Once the target Treasure has been reached, we want to stop updating View

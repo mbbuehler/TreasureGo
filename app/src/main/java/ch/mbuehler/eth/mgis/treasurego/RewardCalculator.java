@@ -15,8 +15,9 @@ class RewardCalculator {
 
     /**
      * Calculates the reward for the given combination of variables.
-     * The reward is calculated as a linear combination of the averageSpeed and currentTemperature.
-     * Returns the reward as number of coins (int): 0 <= reward <= maxReward
+     * If all ARGems have been collected, 50% of the maximum coins are awarded (minReward).
+     * Additionally, the user can earn more coins if she collected the ARGems fast (timeReward).
+     * Returns the reward as number of coins (int)
      *
      * @param treasure                Treasure
      * @param gemCollectionTimeMillis in milliseconds
@@ -38,7 +39,8 @@ class RewardCalculator {
         int restReward = maxReward - minReward;
 
         // If the user was fast he can get additional points.
-        double preciseReward = minReward + restReward * (1 - normalizedCollectionTime);
+        double timeReward = restReward * (1 - normalizedCollectionTime);
+        double preciseReward = minReward + timeReward;
 
         // Reward is measured in coins, so we need an int.
         return (int) Math.round(preciseReward);
@@ -74,6 +76,4 @@ class RewardCalculator {
         Log.v("NORM", String.format("%f, %f, %f, %f", value, min, max, normalizedValue));
         return normalizedValue;
     }
-
-
 }

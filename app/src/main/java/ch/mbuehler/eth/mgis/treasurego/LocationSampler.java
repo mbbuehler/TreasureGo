@@ -111,7 +111,7 @@ class LocationSampler {
         // This is a simple approximates because the distance between latitude degrees is
         // approximately constant.
         double lat = center.getLatitude();
-        double relativeDistanceLatitude = distanceMax / DISTANCE_BETWEEN_LATITUDE / 2;
+        double relativeDistanceLatitude = distanceMax / DISTANCE_BETWEEN_LATITUDE;
         double latitudeMin = lat - relativeDistanceLatitude;
         double latitudeMax = lat + relativeDistanceLatitude;
 
@@ -123,7 +123,7 @@ class LocationSampler {
         double latRad = Math.toRadians(lat);
         double delta = distanceMax / EARTH_RADIUS;
         double deltaLngRad = Math.asin(Math.sin(delta) / Math.cos(latRad));
-        double deltaLngDeg = Math.toDegrees(deltaLngRad) / 2;
+        double deltaLngDeg = Math.toDegrees(deltaLngRad);
 
         double longitudeMin = lng - deltaLngDeg;
         double longitudeMax = lng + deltaLngDeg;
