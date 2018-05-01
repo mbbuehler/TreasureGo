@@ -70,11 +70,11 @@ public class CompassActivity extends AppCompatActivity implements LocationListen
     /**
      * Max time between location updates
      */
-    private static final long TIME_BW_UPDATES = 1000; // in milliseconds
+    private static final long TIME_BW_UPDATES = 300; // in milliseconds
     /**
      * Distance threshold for location updates
      */
-    private static final long DIST_BW_UPDATES = 5; // in meters
+    private static final long DIST_BW_UPDATES = 1; // in meters
     /**
      * When the user gets closer to the target Treasure than this value,
      * we consider the Treasure as "found"
