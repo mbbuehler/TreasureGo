@@ -18,7 +18,7 @@ Talk to me
 =========
 I am happy to receive your feedback or advice you in case you are interested to further develop this app or just learn more about it.
 
-Features
+Feature Ideas
 =========
 Here are some ideas about possible new features:
 - Time bonus: In the AR view, let a clock fly by. If the user catches the clock she gets rewarded 5 extra seconds.
